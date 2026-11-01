@@ -60,7 +60,7 @@ const envelopeSchema = z.object({
 	page: z
 		.object({
 			returnedCount: z.number(),
-			totalCount: z.number(),
+			totalCount: z.number().nullable(),
 			truncated: z.boolean(),
 			nextCursor: z.json().nullable(),
 		})
@@ -329,7 +329,9 @@ function envelopeFooter(envelope: z.infer<typeof envelopeSchema>, style: Style):
 		const next =
 			page.nextCursor === null ? "" : ` Next page: --cursor '${JSON.stringify(page.nextCursor)}'`;
 
-		lines.push(`Showing ${page.returnedCount} of ${page.totalCount}.${next}`);
+		const total = page.totalCount === null ? "more" : page.totalCount;
+
+		lines.push(`Showing ${page.returnedCount} of ${total}.${next}`);
 	}
 
 	if (quality && quality.state !== "complete") {

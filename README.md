@@ -60,11 +60,23 @@ With [Homebrew](https://brew.sh) on macOS or Linux:
 brew install raintree-technology/tap/betteroff
 ```
 
-Or with the install script:
+Or download the install script at a fixed commit and inspect it before running:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/raintree-technology/betteroff.cli/main/install.sh | sh
+installer="$(mktemp)"
+curl --proto '=https' --tlsv1.2 -fsSL \
+  https://raw.githubusercontent.com/raintree-technology/betteroff.cli/5b51b59219af5845e25c948d78469909bf6363e8/install.sh \
+  -o "$installer" && cat "$installer"
 ```
+
+After reviewing the downloaded script, run it in the same shell:
+
+```sh
+sh "$installer"
+rm -f "$installer"
+```
+
+The commit pins the installer, not the release it downloads. Review changes before updating this pin.
 
 The script downloads the binary for your system from the [latest release](https://github.com/raintree-technology/betteroff.cli/releases/latest) into `~/.local/bin` and refuses to install it unless it matches the release's `SHA256SUMS`. If the [GitHub CLI](https://cli.github.com) is installed and signed in, it also checks the binary's build provenance, which proves it was built by this repository's release workflow. Set `BETTEROFF_VERSION=0.1.2` for a specific version or `BETTEROFF_INSTALL_DIR` for another folder.
 
