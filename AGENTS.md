@@ -35,8 +35,8 @@ BetterOff is a household finance app. This repository is `betteroff`, a read-onl
 
 ## Agent credential access
 
-For infrastructure credential access, follow the
-[finance repository's access rules](https://github.com/raintree-technology/betteroff.finance/blob/main/AGENTS.md#agent-credential-access).
+For infrastructure credential access, maintainers follow the access rules in
+BetterOff's private finance repository.
 Use only this project's services and permissions. If access-tier guidance is
 missing, report the gap before using credentials. Production access and secret
 changes require an explicit request in the current task.
