@@ -1,6 +1,6 @@
 # Contributing to the BetterOff CLI
 
-[README](README.md) · [Agent guide](AGENTS.md) · [Security policy](SECURITY.md)
+[README](README.md) · [Security policy](SECURITY.md)
 
 Use this guide to propose a change and run the repository checks. Report a vulnerability as described in [SECURITY.md](SECURITY.md), not in a public issue.
 
