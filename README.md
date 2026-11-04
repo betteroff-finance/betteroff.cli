@@ -50,7 +50,7 @@ The accounts above are made up.
 
 ## Before you start
 
-You need a [BetterOff](https://betteroff.finance/github) account with the accounts and wallets you want to read connected, on any plan, including Free. Some commands need BetterOff Member. Every member of the household must turn on Chat data access in BetterOff's Settings before any agent, this CLI included, can read household data.
+You need a [BetterOff](https://betteroff.finance/github) account with the accounts and wallets you want to read connected, on any plan, including Free. Some commands need the Better plan. Every member of the household must turn on Chat data access in BetterOff's Settings before any agent, this CLI included, can read household data.
 
 ## Install
 
