@@ -54,12 +54,13 @@ jobs:
           for target in darwin-arm64 darwin-x64 linux-x64 linux-arm64 windows-x64; do
             suffix=""
             if [ "$target" = "windows-x64" ]; then suffix=".exe"; fi
-            bun build src/main.ts --compile --minify --target="bun-$target" --outfile "release/betteroff-$target$suffix"
+            bun build src/main.ts --compile --no-compile-autoload-bunfig --no-compile-autoload-dotenv --minify --target="bun-$target" --outfile "release/betteroff-$target$suffix"
           done
           # Ad hoc for now; the notarize job replaces this with Developer ID on a release.
           codesign --force --options runtime --entitlements macos/entitlements.plist --sign - \
             release/betteroff-darwin-arm64 release/betteroff-darwin-x64
           ./release/betteroff-darwin-arm64 --version
+          scripts/check-compiled-isolation.sh ./release/betteroff-darwin-arm64
           sh macos/check-jit.sh release/betteroff-darwin-arm64 release/betteroff-darwin-x64
           (cd release && shasum -a 256 betteroff-* > SHA256SUMS && cat SHA256SUMS)
       - name: Check the Homebrew formula generates

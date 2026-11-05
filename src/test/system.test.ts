@@ -79,3 +79,35 @@ describe("fileLock", () => {
 		}
 	});
 });
+
+describe("fileLock takeover", () => {
+	test("a holder that lost a stale lock does not remove its successor's lock", async () => {
+		const directory = await mkdtemp(join(tmpdir(), "betteroff-lock-"));
+		const path = join(directory, "token.lock");
+		const withLock = fileLock(directory, path);
+		let releaseFirst = () => {};
+		let releaseSecond = () => {};
+
+		try {
+			const first = withLock(() => new Promise<void>((resolve) => (releaseFirst = resolve)));
+
+			await Bun.sleep(30);
+
+			const old = new Date(Date.now() - 31_000);
+
+			await utimes(path, old, old);
+
+			const second = withLock(() => new Promise<void>((resolve) => (releaseSecond = resolve)));
+
+			await Bun.sleep(200);
+			releaseFirst();
+			await first;
+			expect(await stat(path).catch(() => null)).not.toBeNull();
+			releaseSecond();
+			await second;
+			expect(await stat(path).catch(() => null)).toBeNull();
+		} finally {
+			await rm(directory, { recursive: true, force: true });
+		}
+	});
+});

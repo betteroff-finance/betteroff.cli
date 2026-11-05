@@ -422,7 +422,7 @@ async function tokenLogin(deps: CliDeps): Promise<number> {
 		return 1;
 	}
 
-	await keychain(deps, () => deps.tokens.set(token));
+	await deps.withLock(() => keychain(deps, () => deps.tokens.set(token)));
 	deps.stderr(`Saved ${token.slice(0, DISPLAY_PREFIX_LENGTH)}… to the system keychain.\n`);
 
 	if (!check.ok) deps.stderr(`Note: ${errorMessage(check.status, check.body, check.retryAfter)}\n`);
@@ -533,7 +533,7 @@ async function browserLogin(deps: CliDeps): Promise<number> {
 			now: deps.now(),
 		});
 
-		await keychain(deps, () => deps.tokens.set(encodeSession(session)));
+		await deps.withLock(() => keychain(deps, () => deps.tokens.set(encodeSession(session))));
 		deps.stderr(
 			session.refreshToken
 				? "Signed in. The CLI renews access on its own; the sign-in lasts up to 30 days.\n"
@@ -546,16 +546,29 @@ async function browserLogin(deps: CliDeps): Promise<number> {
 	}
 }
 
+const ACCOUNT_USAGE = {
+	login: "Usage: betteroff login [--token]",
+	status: "Usage: betteroff status",
+	logout: "Usage: betteroff logout",
+};
+
 async function login(deps: CliDeps, flags: string[]): Promise<number> {
 	if (flags.includes("--token")) return await tokenLogin(deps);
 
-	if (flags.length > 0) throw new UsageError("Usage: betteroff login [--token]");
+	if (flags.length > 0) throw new UsageError(ACCOUNT_USAGE.login);
 
 	return await browserLogin(deps);
 }
 
 /** Revokes a browser sign-in at BetterOff before forgetting it, so the refresh token stops working. */
-async function logout(deps: CliDeps): Promise<number> {
+async function logout(deps: CliDeps, flags: string[]): Promise<number> {
+	if (flags.length > 0) throw new UsageError(ACCOUNT_USAGE.logout);
+
+	// Under the lock, so a renewal that is finishing cannot write the session back afterward.
+	return await deps.withLock(() => endSession(deps));
+}
+
+async function endSession(deps: CliDeps): Promise<number> {
 	const stored = await keychain(deps, () => deps.tokens.get());
 	const credential = stored ? decodeCredential(stored) : null;
 
@@ -584,7 +597,9 @@ async function logout(deps: CliDeps): Promise<number> {
 	return 0;
 }
 
-async function status(deps: CliDeps): Promise<number> {
+async function status(deps: CliDeps, flags: string[]): Promise<number> {
+	if (flags.length > 0) throw new UsageError(ACCOUNT_USAGE.status);
+
 	const resolved = await resolveToken(deps);
 
 	const lines = [
@@ -616,11 +631,17 @@ export async function run(argv: string[], deps: CliDeps): Promise<number> {
 			return 0;
 		}
 
+		if (help && (command === "login" || command === "status" || command === "logout")) {
+			deps.stdout(`${ACCOUNT_USAGE[command]}\n`);
+
+			return 0;
+		}
+
 		if (command === "login") return await login(deps, flags);
 
-		if (command === "status") return await status(deps);
+		if (command === "status") return await status(deps, flags);
 
-		if (command === "logout") return await logout(deps);
+		if (command === "logout") return await logout(deps, flags);
 
 		const { tools } = await loadTools(deps);
 
@@ -686,6 +707,8 @@ export async function run(argv: string[], deps: CliDeps): Promise<number> {
 			return 1;
 		}
 
-		throw error;
+		deps.stderr(`${safeText(error instanceof Error ? error.message : String(error))}\n`);
+
+		return 1;
 	}
 }

@@ -284,3 +284,42 @@ describe("run", () => {
 		}
 	});
 });
+
+describe("account command help", () => {
+	test.each(["login", "status", "logout"])("%s --help changes nothing", async (command) => {
+		const harness = fakeDeps(() => {
+			throw new Error("help must not use the network");
+		});
+		const deleted: boolean[] = [];
+		const remove = harness.deps.tokens.delete;
+
+		harness.deps.tokens.delete = async () => {
+			deleted.push(true);
+
+			return await remove();
+		};
+
+		expect(await run([command, "--help"], harness.deps)).toBe(0);
+		expect(harness.stdout()).toContain(`betteroff ${command}`);
+		expect(deleted).toEqual([]);
+	});
+
+	test("logout refuses flags it does not know", async () => {
+		const harness = fakeDeps(() => new Response("{}"));
+
+		expect(await run(["logout", "--force"], harness.deps)).toBe(2);
+	});
+
+	test("an unexpected failure is one line, not a stack", async () => {
+		const harness = fakeDeps(() => {
+			throw new Error("connection refused");
+		});
+
+		harness.deps.specCache.read = async () => {
+			throw new Error("connection refused");
+		};
+
+		expect(await run(["accounts"], harness.deps)).toBe(1);
+		expect(harness.stderr().trim().split("\n")).toHaveLength(1);
+	});
+});
