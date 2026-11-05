@@ -159,7 +159,10 @@ export async function accessToken(store: SessionStore, force: boolean): Promise<
 			session.refreshToken,
 		);
 
-		await store.write(encodeSession(renewed));
+		// The server has already rotated the token, so losing this write ends the sign-in.
+		const encoded = encodeSession(renewed);
+
+		await store.write(encoded).catch(() => store.write(encoded));
 
 		return renewed.accessToken ?? null;
 	});

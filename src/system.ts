@@ -1,4 +1,5 @@
-import { mkdir, open, stat, unlink } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
+import { mkdir, open, readFile, stat, unlink } from "node:fs/promises";
 import * as z from "zod";
 import type { CallbackServer } from "./cli";
 
@@ -75,6 +76,36 @@ const STALE_LOCK_MS = 30_000;
 
 const WAIT_MS = 15_000;
 
+const HEARTBEAT_MS = 5_000;
+
+/**
+ * Removes a stale lock under a second O_EXCL file. Without it, two waiters can both see the stale
+ * lock, and the second unlink removes the fresh lock the first one just created.
+ */
+async function removeStale(path: string): Promise<void> {
+	const guardPath = `${path}.takeover`;
+	const guard = await open(guardPath, "wx", 0o600).catch(() => null);
+
+	if (!guard) {
+		const left = await stat(guardPath).catch(() => null);
+
+		if (left && Date.now() - left.mtimeMs > STALE_LOCK_MS) await unlink(guardPath).catch(() => {});
+
+		await Bun.sleep(50);
+
+		return;
+	}
+
+	try {
+		const lock = await stat(path).catch(() => null);
+
+		if (lock && Date.now() - lock.mtimeMs > STALE_LOCK_MS) await unlink(path).catch(() => {});
+	} finally {
+		await guard.close();
+		await unlink(guardPath).catch(() => {});
+	}
+}
+
 /** A lock file created with O_EXCL, so only one CLI process renews the sign-in at a time. */
 export function fileLock(directory: string, path: string) {
 	return async <T>(action: () => Promise<T>): Promise<T> => {
@@ -92,7 +123,7 @@ export function fileLock(directory: string, path: string) {
 				const lock = await stat(path).catch(() => null);
 
 				if (lock && Date.now() - lock.mtimeMs > STALE_LOCK_MS) {
-					await unlink(path).catch(() => {});
+					await removeStale(path);
 					continue;
 				}
 
@@ -103,11 +134,24 @@ export function fileLock(directory: string, path: string) {
 			}
 		}
 
+		const held = handle;
+		const owner = randomUUID();
+		await held.writeFile(owner);
+
+		const heartbeat = setInterval(() => {
+			const now = new Date();
+			held.utimes(now, now).catch(() => {});
+		}, HEARTBEAT_MS);
+
 		try {
 			return await action();
 		} finally {
-			await handle.close();
-			await unlink(path).catch(() => {});
+			clearInterval(heartbeat);
+			await held.close();
+
+			// A process that outlived its lock must not remove the lock of the one that took over.
+			if ((await readFile(path, "utf8").catch(() => null)) === owner)
+				await unlink(path).catch(() => {});
 		}
 	};
 }

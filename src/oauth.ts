@@ -234,6 +234,9 @@ export function pastedRedirect(text: string, redirectUri: string): URLSearchPara
 /** Thrown when the server refuses a refresh token, so the user has to sign in again. */
 export class SignInExpiredError extends OAuthError {}
 
+/** Shorter than the lock's wait, so a hung renewal fails before other commands give up on it. */
+const TOKEN_REQUEST_TIMEOUT_MS = 12_000;
+
 async function tokenRequest(
 	fetch: OAuthFetch,
 	endpoint: string,
@@ -244,6 +247,7 @@ async function tokenRequest(
 		headers: { "content-type": "application/x-www-form-urlencoded", accept: "application/json" },
 		body: new URLSearchParams(form).toString(),
 		redirect: "error",
+		signal: AbortSignal.timeout(TOKEN_REQUEST_TIMEOUT_MS),
 	});
 	const body = z.json().safeParse(await response.json().catch(() => null)).data ?? null;
 

@@ -19,3 +19,10 @@ describe("safeJson", () => {
 		expect(JSON.parse(json)).toEqual(value);
 	});
 });
+
+describe("invisible characters", () => {
+	test("are replaced, and emoji joiners survive", () => {
+		expect(safeText("a​b﻿c d\u{e0041}")).toBe("a�b�c�d�");
+		expect(safeText("👩‍💻")).toBe("👩‍💻");
+	});
+});
