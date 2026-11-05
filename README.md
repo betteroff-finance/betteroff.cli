@@ -166,21 +166,21 @@ rm -rf ~/.cache/betteroff
 
 ## Troubleshooting
 
-| Message | What to do |
-| --- | --- |
-| `Not signed in. Run: betteroff login` | Sign in, or set `BETTEROFF_API_TOKEN`. |
-| `Your BetterOff sign-in has expired or was revoked.` | Run `betteroff login` again. Sign-ins last up to 30 days, and ending the connection in BetterOff's settings revokes it. |
-| `The system keychain refused the request` | The keychain is locked, which is common over SSH. Run `security unlock-keychain` on macOS, or use `BETTEROFF_API_TOKEN`. |
-| `Sign-in timed out.` | The browser did not come back within 5 minutes. Over SSH, paste the address the browser ends on. |
-| A command needs a flag you do not have | `betteroff <command> --help` lists its flags; required ones are marked. |
+| Message                                              | What to do                                                                                                               |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `Not signed in. Run: betteroff login`                | Sign in, or set `BETTEROFF_API_TOKEN`.                                                                                   |
+| `Your BetterOff sign-in has expired or was revoked.` | Run `betteroff login` again. Sign-ins last up to 30 days, and ending the connection in BetterOff's settings revokes it.  |
+| `The system keychain refused the request`            | The keychain is locked, which is common over SSH. Run `security unlock-keychain` on macOS, or use `BETTEROFF_API_TOKEN`. |
+| `Sign-in timed out.`                                 | The browser did not come back within 5 minutes. Over SSH, paste the address the browser ends on.                         |
+| A command needs a flag you do not have               | `betteroff <command> --help` lists its flags; required ones are marked.                                                  |
 
 ## Environment variables
 
-| Variable | Use |
-| --- | --- |
-| `BETTEROFF_API_TOKEN` | Personal API token (`bo_pat_...`). Overrides the saved token. |
-| `BETTEROFF_API_URL` | BetterOff API origin or loopback development origin. Defaults to `https://api.betteroff.finance`. |
-| `NO_COLOR` | Any value turns off terminal styling. |
+| Variable              | Use                                                                                               |
+| --------------------- | ------------------------------------------------------------------------------------------------- |
+| `BETTEROFF_API_TOKEN` | Personal API token (`bo_pat_...`). Overrides the saved token.                                     |
+| `BETTEROFF_API_URL`   | BetterOff API origin or loopback development origin. Defaults to `https://api.betteroff.finance`. |
+| `NO_COLOR`            | Any value turns off terminal styling.                                                             |
 
 ## Security
 
@@ -213,14 +213,14 @@ The `Release` workflow builds the binaries, signs and notarizes the macOS ones, 
 
 Secrets live in the `release` environment, which only `v*` tags can use:
 
-| Secret | What it is |
-| --- | --- |
-| `APPLE_DEVELOPER_ID_P12_BASE64` | Developer ID Application certificate and private key, as base64 of a `.p12` export |
-| `APPLE_DEVELOPER_ID_P12_PASSWORD` | Password of that `.p12` |
-| `APPLE_NOTARY_KEY_P8` | App Store Connect API key (`.p8` contents) with the Developer role, for `notarytool` |
-| `APPLE_NOTARY_KEY_ID` | That key's ID |
-| `APPLE_NOTARY_ISSUER_ID` | The App Store Connect issuer ID |
-| `HOMEBREW_TAP_DEPLOY_KEY` | Private half of a deploy key that can write only to the tap repository |
+| Secret                            | What it is                                                                           |
+| --------------------------------- | ------------------------------------------------------------------------------------ |
+| `APPLE_DEVELOPER_ID_P12_BASE64`   | Developer ID Application certificate and private key, as base64 of a `.p12` export   |
+| `APPLE_DEVELOPER_ID_P12_PASSWORD` | Password of that `.p12`                                                              |
+| `APPLE_NOTARY_KEY_P8`             | App Store Connect API key (`.p8` contents) with the Developer role, for `notarytool` |
+| `APPLE_NOTARY_KEY_ID`             | That key's ID                                                                        |
+| `APPLE_NOTARY_ISSUER_ID`          | The App Store Connect issuer ID                                                      |
+| `HOMEBREW_TAP_DEPLOY_KEY`         | Private half of a deploy key that can write only to the tap repository               |
 
 Notarization is on (repository variable `NOTARIZE` is `true`), so a release whose macOS binaries are not signed and accepted by Apple is not published. Apple usually answers in minutes but can take over an hour; the job waits up to 80 minutes.
 
