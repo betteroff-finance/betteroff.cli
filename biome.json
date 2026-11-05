@@ -85,11 +85,8 @@
 			"nursery": {
 				"noFloatingPromises": "error",
 				"noMisusedPromises": "error",
-				"useSortedClasses": {
-					"level": "error",
-					"options": {
-						"functions": ["clsx", "cn", "cva", "tw", "twMerge"]
-					}
+				"useTailwindSortedClasses": {
+					"level": "error"
 				}
 			},
 			"performance": {
@@ -133,5 +130,9 @@
 				"noNoninteractiveTabindex": "error"
 			}
 		}
+	},
+	"tailwind": {
+		"mergeFunctions": ["clsx", "cn", "tw", "twMerge"],
+		"variantFunctions": ["cva"]
 	}
 }
