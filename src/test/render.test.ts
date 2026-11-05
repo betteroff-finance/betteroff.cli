@@ -70,6 +70,21 @@ describe("renderPretty layout", () => {
 });
 
 describe("renderPretty tool results", () => {
+	test("reports a truncated page whose total is unknown", () => {
+		const output = renderPretty(
+			{
+				ok: true,
+				schemaVersion: "4",
+				data: { observations: [{ title: "Rent rose" }] },
+				page: { returnedCount: 1, totalCount: null, truncated: true, nextCursor: { offset: 1 } },
+			},
+			100,
+			plainStyle,
+		);
+
+		expect(output).toContain(`Showing 1 of more. Next page: --cursor '{"offset":1}'`);
+	});
+
 	test("unwraps the result envelope and reports paging, quality, and freshness", () => {
 		const output = renderPretty(
 			{

@@ -1,7 +1,7 @@
 #!/bin/sh
 # Installs the BetterOff CLI from a GitHub release.
 #
-#   curl -fsSL https://raw.githubusercontent.com/raintree-technology/betteroff.cli/main/install.sh | sh
+# See README.md for the commit-pinned download and review steps.
 #
 # BETTEROFF_VERSION     a version such as 0.1.0 (default: the latest release)
 # BETTEROFF_INSTALL_DIR where to put the binary (default: ~/.local/bin)
