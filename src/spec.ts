@@ -26,6 +26,7 @@ const operationSchema = z.object({
 	operationId: z.string(),
 	summary: z.string(),
 	description: z.string().default(""),
+	deprecated: z.boolean().default(false),
 	"x-mcp-annotations": z.object({ readOnlyHint: z.boolean().default(false) }).default({
 		readOnlyHint: false,
 	}),
@@ -75,6 +76,8 @@ export type Tool = {
 	aliases: string[];
 	summary: string;
 	description: string;
+	/** Still runs until its sunset date; the API sends the date on each response. */
+	deprecated: boolean;
 	flags: Flag[];
 };
 
@@ -222,6 +225,7 @@ export function toolsFromSpec(spec: ToolsSpec): Tool[] {
 			aliases: command === full ? [] : [full],
 			summary: safeText(operation.summary),
 			description: safeText(operation.description),
+			deprecated: operation.deprecated,
 			flags,
 		});
 	}

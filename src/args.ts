@@ -4,6 +4,9 @@ import type { Flag, Tool } from "./spec";
 
 export class UsageError extends Error {}
 
+/** The value is not in the flag's list, which may only mean the cached spec is out of date. */
+export class ChoiceError extends UsageError {}
+
 function parseNumber(flag: Flag, text: string): number {
 	const value = Number(text);
 
@@ -18,7 +21,7 @@ function parseNumber(flag: Flag, text: string): number {
 
 function checkChoice(flag: Flag, value: string): string {
 	if (flag.choices.length > 0 && !flag.choices.includes(value))
-		throw new UsageError(`--${flag.flag} must be one of: ${flag.choices.join(", ")}.`);
+		throw new ChoiceError(`--${flag.flag} must be one of: ${flag.choices.join(", ")}.`);
 
 	return value;
 }

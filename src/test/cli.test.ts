@@ -189,6 +189,97 @@ describe("run", () => {
 		expect(harness.stdout()).toContain("transactions");
 	});
 
+	test("a deprecated tool still runs and warns on stderr with its sunset date", async () => {
+		const paths = z.record(z.string(), z.json()).parse(fixtureSpec.paths);
+		const spec = {
+			...fixtureSpec,
+			paths: {
+				...paths,
+				"/v1/tools/betteroff_get_old_view": {
+					post: {
+						operationId: "betteroff_get_old_view",
+						summary: "Old view",
+						deprecated: true,
+						"x-mcp-annotations": { readOnlyHint: true },
+					},
+				},
+			},
+		};
+		const sunset = "Tue, 13 Apr 2027 00:00:00 GMT";
+		const harness = fakeDeps(
+			(url) =>
+				url.endsWith("/openapi/tools.json")
+					? Response.json(spec)
+					: Response.json(accounts, { headers: { sunset } }),
+			{ env: { BETTEROFF_API_TOKEN: TOKEN } },
+		);
+
+		expect(await run(["old-view"], harness.deps)).toBe(0);
+		expect(harness.stdout()).toContain("Checking");
+		expect(harness.stderr()).toContain(`old-view is deprecated and stops working after ${sunset}`);
+
+		const list = fakeDeps(api(() => Response.json(accounts)));
+
+		list.deps.fetch = harness.deps.fetch;
+		expect(await run(["--help"], list.deps)).toBe(0);
+		expect(list.stdout()).toContain("Old view (deprecated)");
+	});
+
+	test("refetches a cached spec once before rejecting a new enum value", async () => {
+		const withChoice = (choices: string[]) => {
+			const portfolio = {
+				post: {
+					operationId: "betteroff_get_portfolio",
+					summary: "Portfolio",
+					"x-mcp-annotations": { readOnlyHint: true },
+					requestBody: {
+						content: {
+							"application/json": {
+								schema: {
+									type: "object",
+									properties: { groupBy: { type: "string", enum: choices, default: "asset" } },
+								},
+							},
+						},
+					},
+				},
+			};
+
+			return { info: fixtureSpec.info, paths: { "/v1/tools/betteroff_get_portfolio": portfolio } };
+		};
+		let served = withChoice(["asset", "account"]);
+		const harness = fakeDeps(
+			(url) =>
+				url.endsWith("/openapi/tools.json") ? Response.json(served) : Response.json(accounts),
+			{ env: { BETTEROFF_API_TOKEN: TOKEN } },
+		);
+		const specFetches = () =>
+			harness.requests.filter((request) => request.url.endsWith("/openapi/tools.json")).length;
+
+		expect(await run(["portfolio", "--group-by", "account"], harness.deps)).toBe(0);
+		expect(specFetches()).toBe(1);
+
+		served = withChoice(["asset", "account", "sector"]);
+		expect(await run(["portfolio", "--group-by", "sector"], harness.deps)).toBe(0);
+		expect(specFetches()).toBe(2);
+
+		expect(await run(["portfolio", "--group-by", "nonsense"], harness.deps)).toBe(2);
+		expect(specFetches()).toBe(3);
+		expect(harness.stderr()).toContain("must be one of: asset, account, sector");
+	});
+
+	test("reports a tool call that times out", async () => {
+		const harness = fakeDeps((url) => {
+			if (url.endsWith("/openapi/tools.json")) return Response.json(fixtureSpec);
+			throw new DOMException("timed out", "TimeoutError");
+		});
+
+		await harness.deps.tokens.set("bo_pat_test");
+		expect(await run(["accounts"], harness.deps)).toBe(1);
+		expect(harness.stderr()).toContain("did not answer");
+		expect(harness.requests.every((request) => request.init?.signal)).toBe(true);
+	});
+
 	test("explains when the tool list cannot be loaded at all", async () => {
 		const harness = fakeDeps(() => new Response("down", { status: 503 }));
 

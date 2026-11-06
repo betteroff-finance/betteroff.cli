@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { parseToolArgs, UsageError } from "./args";
+import { ChoiceError, parseToolArgs, UsageError } from "./args";
 import {
 	accessToken,
 	decodeCredential,
@@ -134,7 +134,14 @@ function apiUrl(deps: CliDeps): string {
 	return url.origin;
 }
 
-async function loadTools(deps: CliDeps): Promise<{ version: string; tools: Tool[] }> {
+type LoadedTools = {
+	version: string;
+	tools: Tool[];
+	/** Read from a cache that was still fresh, so a newer spec may exist. */
+	fromCache: boolean;
+};
+
+async function loadTools(deps: CliDeps, refresh = false): Promise<LoadedTools> {
 	const base = apiUrl(deps);
 	const cachedText = await deps.specCache.read().catch(() => null);
 	let cached: z.infer<typeof cachedSpecSchema> | undefined;
@@ -145,13 +152,18 @@ async function loadTools(deps: CliDeps): Promise<{ version: string; tools: Tool[
 		cached = undefined;
 	}
 
-	if (cached && cached.apiUrl === base && deps.now() - cached.fetchedAt < SPEC_MAX_AGE_MS)
-		return { version: cached.spec.info.version, tools: toolsFromSpec(cached.spec) };
+	if (!refresh && cached?.apiUrl === base && deps.now() - cached.fetchedAt < SPEC_MAX_AGE_MS)
+		return {
+			version: cached.spec.info.version,
+			tools: toolsFromSpec(cached.spec),
+			fromCache: true,
+		};
 
 	try {
 		const response = await deps.fetch(`${base}/openapi/tools.json`, {
 			headers: { accept: "application/json", "user-agent": `betteroff-cli/${VERSION}` },
 			redirect: "error",
+			signal: AbortSignal.timeout(SPEC_TIMEOUT_MS),
 		});
 
 		if (!response.ok) throw new ApiError(`HTTP ${response.status}`);
@@ -162,11 +174,15 @@ async function loadTools(deps: CliDeps): Promise<{ version: string; tools: Tool[
 			.write(JSON.stringify({ apiUrl: base, fetchedAt: deps.now(), spec }))
 			.catch(() => {});
 
-		return { version: spec.info.version, tools: toolsFromSpec(spec) };
+		return { version: spec.info.version, tools: toolsFromSpec(spec), fromCache: false };
 	} catch (error) {
 		// A stale command list beats none when the API is briefly unreachable.
 		if (cached?.apiUrl === base)
-			return { version: cached.spec.info.version, tools: toolsFromSpec(cached.spec) };
+			return {
+				version: cached.spec.info.version,
+				tools: toolsFromSpec(cached.spec),
+				fromCache: false,
+			};
 		throw new ApiError(
 			`Could not load the BetterOff tool list from ${base}/openapi/tools.json (${error instanceof Error ? error.message : "unknown error"}).`,
 		);
@@ -253,19 +269,30 @@ function errorMessage(status: number, body: JsonValue, retryAfter: string | null
 	return safeText(`${text}${code}${parsed?.nextStep ? `\n${parsed.nextStep}` : ""}`);
 }
 
+// Above the server's 25s tool deadline, so its error arrives first.
+const TOOL_TIMEOUT_MS = 30_000;
+const SPEC_TIMEOUT_MS = 10_000;
+
 async function callTool(deps: CliDeps, token: string, tool: Tool, args: JsonValue) {
 	// A redirect would resend the token to wherever it points, so any redirect is an error.
-	const response = await deps.fetch(`${apiUrl(deps)}/v1/tools/${encodeURIComponent(tool.name)}`, {
-		method: "POST",
-		redirect: "error",
-		headers: {
-			authorization: `Bearer ${token}`,
-			"content-type": "application/json",
-			accept: "application/json",
-			"user-agent": `betteroff-cli/${VERSION}`,
-		},
-		body: JSON.stringify(args),
-	});
+	const response = await deps
+		.fetch(`${apiUrl(deps)}/v1/tools/${encodeURIComponent(tool.name)}`, {
+			method: "POST",
+			redirect: "error",
+			signal: AbortSignal.timeout(TOOL_TIMEOUT_MS),
+			headers: {
+				authorization: `Bearer ${token}`,
+				"content-type": "application/json",
+				accept: "application/json",
+				"user-agent": `betteroff-cli/${VERSION}`,
+			},
+			body: JSON.stringify(args),
+		})
+		.catch((error: Error) => {
+			if (error.name === "TimeoutError")
+				throw new ApiError(`BetterOff did not answer within ${TOOL_TIMEOUT_MS / 1000} seconds.`);
+			throw error;
+		});
 
 	const text = await response.text();
 	let body: JsonValue = null;
@@ -284,7 +311,23 @@ async function callTool(deps: CliDeps, token: string, tool: Tool, args: JsonValu
 		ok: response.ok && errorBodySchema.safeParse(body).data?.ok !== false,
 		body,
 		retryAfter: response.headers.get("retry-after"),
+		sunset: response.headers.get("sunset"),
 	};
+}
+
+/** A rejected value may be new on the server, so check the current spec once before refusing it. */
+async function parseWithFreshSpec(deps: CliDeps, loaded: LoadedTools, tool: Tool, flags: string[]) {
+	try {
+		return { tool, args: parseToolArgs(tool, flags) };
+	} catch (error) {
+		if (!(error instanceof ChoiceError) || !loaded.fromCache) throw error;
+
+		const current = findTool((await loadTools(deps, true)).tools, tool.command);
+
+		if (!current) throw error;
+
+		return { tool: current, args: parseToolArgs(current, flags) };
+	}
 }
 
 function usage(tools: Tool[], style: Style): string {
@@ -298,7 +341,10 @@ function usage(tools: Tool[], style: Style): string {
 		"  betteroff <command> --help",
 		"",
 		style.bold("Commands"),
-		...tools.map((tool) => `  ${tool.command.padEnd(width)}  ${tool.summary}`),
+		...tools.map(
+			(tool) =>
+				`  ${tool.command.padEnd(width)}  ${tool.summary}${tool.deprecated ? " (deprecated)" : ""}`,
+		),
 		"",
 		style.bold("Account"),
 		`  ${"login".padEnd(width)}  Sign in with your browser (--token to paste an API token)`,
@@ -357,6 +403,9 @@ function toolUsage(tool: Tool, width: number, style: Style): string {
 
 	lines.push(...wrap(forPeople(tool.description), width, ""));
 
+	if (tool.deprecated)
+		lines.push("", style.dim("Deprecated: this command will be removed. See its description."));
+
 	if (tool.flags.length > 0) {
 		lines.push("", style.bold("Flags"));
 
@@ -411,6 +460,7 @@ async function tokenLogin(deps: CliDeps): Promise<number> {
 			aliases: [],
 			summary: "",
 			description: "",
+			deprecated: false,
 			flags: [],
 		},
 		{},
@@ -643,7 +693,8 @@ export async function run(argv: string[], deps: CliDeps): Promise<number> {
 
 		if (command === "logout") return await logout(deps, flags);
 
-		const { tools } = await loadTools(deps);
+		const loaded = await loadTools(deps);
+		const { tools } = loaded;
 
 		if (command === undefined || command === "help") {
 			deps.stdout(usage(tools, style));
@@ -651,17 +702,17 @@ export async function run(argv: string[], deps: CliDeps): Promise<number> {
 			return 0;
 		}
 
-		const tool = findTool(tools, command);
+		const found = findTool(tools, command);
 
-		if (!tool) throw new UsageError(`Unknown command "${command}". Run: betteroff --help`);
+		if (!found) throw new UsageError(`Unknown command "${command}". Run: betteroff --help`);
 
 		if (help) {
-			deps.stdout(toolUsage(tool, Math.min(deps.columns, 100), style));
+			deps.stdout(toolUsage(found, Math.min(deps.columns, 100), style));
 
 			return 0;
 		}
 
-		const args = parseToolArgs(tool, flags);
+		const { tool, args } = await parseWithFreshSpec(deps, loaded, found, flags);
 		const resolved = await resolveToken(deps);
 
 		if (!resolved) throw new ApiError("Not signed in. Run: betteroff login");
@@ -674,6 +725,12 @@ export async function run(argv: string[], deps: CliDeps): Promise<number> {
 
 			if (renewed) result = await callTool(deps, renewed, tool, args);
 		}
+
+		// On stderr, so piped JSON stays exact.
+		if (result.sunset)
+			deps.stderr(
+				`Warning: ${tool.command} is deprecated and stops working after ${safeText(result.sunset)}.\n`,
+			);
 
 		if (!result.ok) throw new ApiError(errorMessage(result.status, result.body, result.retryAfter));
 

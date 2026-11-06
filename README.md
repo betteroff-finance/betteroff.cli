@@ -148,6 +148,15 @@ The CLI calls BetterOff's public tool API, `POST https://api.betteroff.finance/v
 
 Only tools the spec marks read-only become commands. Tools that propose changes or request transfers are left out, even if the spec labels one read-only by mistake. BetterOff enforces the real limit: a browser sign-in can only get read scopes, and an API token has the scopes you gave it, so give it read scopes only.
 
+## Compatibility
+
+- **Commands come from the spec.** A new read tool or flag appears without a CLI update. If the spec cached in the last hour rejects an enum value, the CLI fetches the spec once and tries again before reporting an error. If the API cannot be reached, it uses an older cached spec.
+- **Retries.** The CLI does not retry on its own, except once after renewing an expired browser sign-in. A rate limit error says how long to wait.
+- **Timeouts.** The tool list gets 10 seconds and a tool call gets 30 seconds.
+- **Paging.** Pass the `--cursor` value from the footer, or from the JSON result, to get the next page.
+- **Deprecation.** A deprecated tool stays in the spec and keeps working as a command until its sunset date. `--help` marks it, and each call prints a warning with the date on stderr, so piped JSON is unchanged. After that date the API rejects it.
+- **Exit codes.** `0` success, `1` an API, network, or sign-in error, `2` a usage error such as an unknown command or bad flag.
+
 ## Upgrade and uninstall
 
 ```sh
