@@ -229,7 +229,7 @@ jobs:
           gh release create "$TAG" release/* --repo "$REPO" --verify-tag --title "BetterOff CLI $TAG" --notes-file - <<NOTES
           Read-only BetterOff CLI. Install on macOS or Linux:
 
-              brew install raintree-technology/tap/betteroff
+              brew install betteroff-finance/tap/betteroff
 
           or:
 
@@ -259,7 +259,7 @@ jobs:
       # The deploy key can write only to the tap repository.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: raintree-technology/homebrew-tap
+          repository: betteroff-finance/homebrew-tap
           ssh-key: ${{ secrets.HOMEBREW_TAP_DEPLOY_KEY }}
           path: tap
       - name: Update the formula from the published checksums

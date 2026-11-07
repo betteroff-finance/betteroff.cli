@@ -57,7 +57,7 @@ You need a [BetterOff](https://betteroff.finance/github) account with the accoun
 With [Homebrew](https://brew.sh) on macOS or Linux:
 
 ```sh
-brew install raintree-technology/tap/betteroff
+brew install betteroff-finance/tap/betteroff
 ```
 
 Or download the install script at a fixed commit and inspect it before running:
@@ -218,7 +218,7 @@ Tests use a fake API and never call BetterOff. See [CONTRIBUTING.md](CONTRIBUTIN
 1. Set the version in `package.json` and `VERSION` in `src/cli.ts`, and merge.
 2. Tag the merge commit with a signed tag, `git tag -s v<version>`, and push the tag.
 
-The `Release` workflow builds the binaries, signs and notarizes the macOS ones, attests provenance, publishes the GitHub release, and updates [`raintree-technology/homebrew-tap`](https://github.com/raintree-technology/homebrew-tap). Releases are immutable; to fix one, release a new version.
+The `Release` workflow builds the binaries, signs and notarizes the macOS ones, attests provenance, publishes the GitHub release, and updates [`betteroff-finance/homebrew-tap`](https://github.com/betteroff-finance/homebrew-tap). Releases are immutable; to fix one, release a new version.
 
 Secrets live in the `release` environment, which only `v*` tags can use:
 

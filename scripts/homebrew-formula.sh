@@ -3,7 +3,7 @@
 #
 #   scripts/homebrew-formula.sh 0.1.1 release/SHA256SUMS > Formula/betteroff.rb
 #
-# The release workflow runs this to update raintree-technology/homebrew-tap.
+# The release workflow runs this to update betteroff-finance/homebrew-tap.
 set -eu
 
 version="$1"
