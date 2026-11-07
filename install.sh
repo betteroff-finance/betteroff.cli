@@ -11,7 +11,7 @@
 # workflow. A failed check stops the install.
 set -eu
 
-REPO="raintree-technology/betteroff.cli"
+REPO="betteroff-finance/betteroff.cli"
 INSTALL_DIR="${BETTEROFF_INSTALL_DIR:-$HOME/.local/bin}"
 
 fail() {

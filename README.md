@@ -31,7 +31,7 @@ Read your [BetterOff](https://betteroff.finance/github) household from the termi
 
 The CLI is read-only. It cannot move money, change records, or approve anything. It runs on macOS, Linux, and Windows.
 
-[![CI](https://github.com/raintree-technology/betteroff.cli/actions/workflows/ci.yml/badge.svg)](https://github.com/raintree-technology/betteroff.cli/actions/workflows/ci.yml) [![Latest release](https://img.shields.io/github/v/release/raintree-technology/betteroff.cli)](https://github.com/raintree-technology/betteroff.cli/releases/latest)
+[![CI](https://github.com/betteroff-finance/betteroff.cli/actions/workflows/ci.yml/badge.svg)](https://github.com/betteroff-finance/betteroff.cli/actions/workflows/ci.yml) [![Latest release](https://img.shields.io/github/v/release/betteroff-finance/betteroff.cli)](https://github.com/betteroff-finance/betteroff.cli/releases/latest)
 
 ```console
 $ betteroff accounts
@@ -65,7 +65,7 @@ Or download the install script at a fixed commit and inspect it before running:
 ```sh
 installer="$(mktemp)"
 curl --proto '=https' --tlsv1.2 -fsSL \
-  https://raw.githubusercontent.com/raintree-technology/betteroff.cli/5b51b59219af5845e25c948d78469909bf6363e8/install.sh \
+  https://raw.githubusercontent.com/betteroff-finance/betteroff.cli/5b51b59219af5845e25c948d78469909bf6363e8/install.sh \
   -o "$installer" && cat "$installer"
 ```
 
@@ -78,9 +78,9 @@ rm -f "$installer"
 
 The commit pins the installer, not the release it downloads. Review changes before updating this pin.
 
-The script downloads the binary for your system from the [latest release](https://github.com/raintree-technology/betteroff.cli/releases/latest) into `~/.local/bin` and refuses to install it unless it matches the release's `SHA256SUMS`. If the [GitHub CLI](https://cli.github.com) is installed and signed in, it also checks the binary's build provenance, which proves it was built by this repository's release workflow. Set `BETTEROFF_VERSION=0.1.2` for a specific version or `BETTEROFF_INSTALL_DIR` for another folder.
+The script downloads the binary for your system from the [latest release](https://github.com/betteroff-finance/betteroff.cli/releases/latest) into `~/.local/bin` and refuses to install it unless it matches the release's `SHA256SUMS`. If the [GitHub CLI](https://cli.github.com) is installed and signed in, it also checks the binary's build provenance, which proves it was built by this repository's release workflow. Set `BETTEROFF_VERSION=0.1.2` for a specific version or `BETTEROFF_INSTALL_DIR` for another folder.
 
-You can also download a binary from the [release page](https://github.com/raintree-technology/betteroff.cli/releases/latest) and compare it with `SHA256SUMS`. The macOS binaries are signed with a Developer ID and notarized by Apple, so Gatekeeper accepts them. A browser download is not executable yet; run `chmod +x` on it first. On Windows, download `betteroff-windows-x64.exe`.
+You can also download a binary from the [release page](https://github.com/betteroff-finance/betteroff.cli/releases/latest) and compare it with `SHA256SUMS`. The macOS binaries are signed with a Developer ID and notarized by Apple, so Gatekeeper accepts them. A browser download is not executable yet; run `chmod +x` on it first. On Windows, download `betteroff-windows-x64.exe`.
 
 To check any release binary yourself:
 
@@ -93,7 +93,7 @@ gh attestation verify betteroff-darwin-arm64 --repo raintree-technology/betterof
 With [Bun](https://bun.sh) 1.4.3 or later:
 
 ```sh
-git clone https://github.com/raintree-technology/betteroff.cli.git
+git clone https://github.com/betteroff-finance/betteroff.cli.git
 cd betteroff.cli
 bun install --frozen-lockfile
 bun run build   # writes dist/betteroff

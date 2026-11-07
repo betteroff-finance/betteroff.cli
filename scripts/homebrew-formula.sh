@@ -8,7 +8,7 @@ set -eu
 
 version="$1"
 sums="$2"
-repo="raintree-technology/betteroff.cli"
+repo="betteroff-finance/betteroff.cli"
 
 case "$version" in
 *[!0-9.]* | "") echo "version must look like 0.1.1" >&2 && exit 1 ;;
