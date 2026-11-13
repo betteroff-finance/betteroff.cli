@@ -19,7 +19,7 @@
 		"zod": "4.6.7"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.6.4",
+		"@biomejs/biome": "2.6.6",
 		"@raintree-technology/trellis": "0.3.2",
 		"@types/bun": "1.4.4",
 		"typescript": "7.0.2"
