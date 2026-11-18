@@ -18,7 +18,6 @@ export const SCOPES = [
 	"investments:read",
 	"networth:read",
 	"transactions:read",
-	"transfers:read",
 	"offline_access",
 ];
 

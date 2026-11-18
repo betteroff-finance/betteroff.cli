@@ -146,7 +146,7 @@ Lists are paged. When there is more, the footer prints the `--cursor` value for 
 
 The CLI calls BetterOff's public tool API, `POST https://api.betteroff.finance/v1/tools/<tool>`, the same tools the BetterOff MCP server offers. Its commands and flags come from the public spec at [`/openapi/tools.json`](https://api.betteroff.finance/openapi/tools.json), cached for an hour in `~/.cache/betteroff`. A new read tool in BetterOff shows up as a command without a CLI update.
 
-Only tools the spec marks read-only become commands. Tools that propose changes or request transfers are left out, even if the spec labels one read-only by mistake. BetterOff enforces the real limit: a browser sign-in can only get read scopes, and an API token has the scopes you gave it, so give it read scopes only.
+Only tools the spec marks read-only become commands. Tools that propose changes are left out, even if the spec labels one read-only by mistake. BetterOff enforces the real limit: a browser sign-in can only get read scopes, and an API token has the scopes you gave it, so give it read scopes only.
 
 ## Compatibility
 
@@ -193,7 +193,7 @@ rm -rf ~/.cache/betteroff
 
 ## Security
 
-- **Read-only.** Only tools the spec marks read-only become commands, and tools that propose changes or request transfers are left out by name as well. Give the token read scopes only; the token's scopes are the limit BetterOff enforces.
+- **Read-only.** Only tools the spec marks read-only become commands, and tools that propose changes are left out by name as well. Give the token read scopes only; the token's scopes are the limit BetterOff enforces.
 - **Sign-in uses OAuth with PKCE.** `betteroff login` uses the authorization code flow on a loopback redirect (RFC 8252), checks `state` and the issuer on the way back, and identifies itself with a client metadata document on betteroff.finance that allows only read scopes. Each refresh replaces the refresh token, and a lock keeps two commands from refreshing at once. `betteroff logout` revokes the sign-in at BetterOff.
 - **Tokens go only to BetterOff, over HTTPS.** They are saved in the system keychain, never in a file. On macOS it goes through Apple's `security` tool on stdin, never on a command line. `BETTEROFF_API_URL` accepts only `api.betteroff.finance` or a loopback host, using HTTPS (`http://` only for loopback development), and the CLI never follows a redirect, so the token cannot be sent somewhere else by mistake.
 - **Pinned trust.** Requests trust a bundled Mozilla root certificate snapshot (`src/ca.pem`) instead of Bun's built-in list, which still includes roots Mozilla has distrusted.

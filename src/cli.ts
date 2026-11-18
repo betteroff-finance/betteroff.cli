@@ -452,7 +452,7 @@ async function tokenLogin(deps: CliDeps): Promise<number> {
 	deps.stderr(
 		[
 			`Create a personal API token at ${TOKEN_SETTINGS_URL}`,
-			"Give it read scopes only. This CLI never uses prepare, transfer, or feedback scopes.",
+			"Give it read scopes only. This CLI never uses prepare or feedback scopes.",
 			"",
 		].join("\n"),
 	);
