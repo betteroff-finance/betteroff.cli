@@ -15,6 +15,7 @@ import {
 	discover,
 	exchangeCode,
 	OAuthError,
+	type OAuthFetch,
 	pastedRedirect,
 	randomToken,
 	revokeToken,
@@ -25,6 +26,8 @@ import { findTool, type Tool, toolsFromSpec, toolsSpecSchema } from "./spec";
 import { safeJson, safeText } from "./text";
 
 export const VERSION = "0.1.3";
+
+const USER_AGENT = `betteroff-cli/${VERSION}`;
 
 const DEFAULT_API_URL = "https://api.betteroff.finance";
 
@@ -161,7 +164,7 @@ async function loadTools(deps: CliDeps, refresh = false): Promise<LoadedTools> {
 
 	try {
 		const response = await deps.fetch(`${base}/openapi/tools.json`, {
-			headers: { accept: "application/json", "user-agent": `betteroff-cli/${VERSION}` },
+			headers: { accept: "application/json", "user-agent": USER_AGENT },
 			redirect: "error",
 			signal: AbortSignal.timeout(SPEC_TIMEOUT_MS),
 		});
@@ -212,12 +215,23 @@ async function keychain<T>(deps: CliDeps, action: () => Promise<T>): Promise<T> 
 	}
 }
 
+/** deps.fetch with the CLI's User-Agent, for the sign-in calls in oauth.ts. */
+function oauthFetch(deps: CliDeps): OAuthFetch {
+	return (url, init) => {
+		const headers = new Headers(init?.headers);
+
+		headers.set("user-agent", USER_AGENT);
+
+		return deps.fetch(url, { ...init, headers });
+	};
+}
+
 function sessionStore(deps: CliDeps): SessionStore {
 	return {
 		read: () => keychain(deps, () => deps.tokens.get()),
 		write: (value) => keychain(deps, () => deps.tokens.set(value)),
 		withLock: deps.withLock,
-		fetch: deps.fetch,
+		fetch: oauthFetch(deps),
 		now: deps.now,
 	};
 }
@@ -284,7 +298,7 @@ async function callTool(deps: CliDeps, token: string, tool: Tool, args: JsonValu
 				authorization: `Bearer ${token}`,
 				"content-type": "application/json",
 				accept: "application/json",
-				"user-agent": `betteroff-cli/${VERSION}`,
+				"user-agent": USER_AGENT,
 			},
 			body: JSON.stringify(args),
 		})
@@ -536,7 +550,7 @@ async function waitForRedirect(deps: CliDeps, server: CallbackServer): Promise<U
  * connection in BetterOff's settings.
  */
 async function browserLogin(deps: CliDeps): Promise<number> {
-	const endpoints = await discover(deps.fetch, apiUrl(deps));
+	const endpoints = await discover(oauthFetch(deps), apiUrl(deps));
 	const verifier = randomToken();
 	const state = randomToken();
 	const server = await deps.startCallback();
@@ -571,7 +585,7 @@ async function browserLogin(deps: CliDeps): Promise<number> {
 
 		const params = await waitForRedirect(deps, server);
 		const code = authorizationCode(params, { state, issuer: endpoints.issuer });
-		const tokens = await exchangeCode(deps.fetch, endpoints, {
+		const tokens = await exchangeCode(oauthFetch(deps), endpoints, {
 			code,
 			verifier,
 			redirectUri: server.redirectUri,
@@ -625,7 +639,7 @@ async function endSession(deps: CliDeps): Promise<number> {
 	if (credential?.kind === "oauth" && credential.session.refreshToken) {
 		const { refreshToken, revocationEndpoint } = credential.session;
 		const outcome = revocationEndpoint
-			? await revokeToken(deps.fetch, { revocationEndpoint, refreshToken }).catch(
+			? await revokeToken(oauthFetch(deps), { revocationEndpoint, refreshToken }).catch(
 					(): "failed" => "failed",
 				)
 			: "failed";
