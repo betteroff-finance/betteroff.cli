@@ -145,6 +145,7 @@ Lists are paged. When there is more, the footer prints the `--cursor` value for 
 ### Agents
 
 ```sh
+betteroff chief-list                   # Chief's weekly list of what to do first
 betteroff agents                       # each agent, its schedule, your plan, its last run
 betteroff agents run chief             # start Chief now and print the run id
 betteroff agents run scout --wait      # start Scout and wait for its summary and findings

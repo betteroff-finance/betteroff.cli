@@ -92,6 +92,10 @@ export const fixtureSpec: JsonObject = {
 				},
 			},
 		},
+		"/v1/tools/betteroff_get_chief_list": tool("betteroff_get_chief_list", true, {
+			type: "object",
+			properties: {},
+		}),
 		"/v1/tools/betteroff_list_agents": tool("betteroff_list_agents", true, {
 			type: "object",
 			properties: {},

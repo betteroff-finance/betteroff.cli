@@ -45,6 +45,20 @@ describe("agents", () => {
 		expect(harness.stdout()).toContain("Chief");
 	});
 
+	test("`chief-list` reads Chief's weekly list", async () => {
+		const harness = fakeDeps(
+			agentsApi({
+				betteroff_get_chief_list: () =>
+					Response.json({ ok: true, list: { detail: "1. Pay the Visa $420 by Dec 1." } }),
+			}),
+			signedIn,
+		);
+
+		expect(await run(["chief-list"], harness.deps)).toBe(0);
+		expect(toolCalls(harness.requests)).toEqual(["betteroff_get_chief_list"]);
+		expect(harness.stdout()).toContain("Pay the Visa");
+	});
+
 	test("the run tool has no command of its own", async () => {
 		const harness = fakeDeps(agentsApi({}), signedIn);
 
