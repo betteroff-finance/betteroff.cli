@@ -29,7 +29,7 @@
 
 Read your [BetterOff](https://betteroff.finance/github) household from the terminal: accounts, net worth, transactions, spending, cash flow, recurring bills, portfolio, and debts.
 
-The CLI is read-only. It cannot move money, change records, or approve anything. It runs on macOS, Linux, and Windows.
+The CLI reads your data and can start your BetterOff agents. It cannot move money or approve anything. It runs on macOS, Linux, and Windows.
 
 [![CI](https://github.com/betteroff-finance/betteroff.cli/actions/workflows/ci.yml/badge.svg)](https://github.com/betteroff-finance/betteroff.cli/actions/workflows/ci.yml) [![Latest release](https://img.shields.io/github/v/release/betteroff-finance/betteroff.cli)](https://github.com/betteroff-finance/betteroff.cli/releases/latest)
 
@@ -142,11 +142,22 @@ betteroff recurring --json | jq '.data'
 
 Lists are paged. When there is more, the footer prints the `--cursor` value for the next page.
 
+### Agents
+
+```sh
+betteroff agents                       # each agent, its schedule, your plan, its last run
+betteroff agents run chief             # start Chief now and print the run id
+betteroff agents run scout --wait      # start Scout and wait for its summary and findings
+betteroff agent-run --run-id <id>      # read a run later
+```
+
+An agent reads your data, files findings to To-Do, and prepares corrections for you to approve in BetterOff. It never moves money or sends anything. Each agent runs at most once per ten minutes on demand; asking again in that window returns the same run. Agents your plan does not include return the link to start a Plus trial.
+
 ## How it works
 
 The CLI calls BetterOff's public tool API, `POST https://api.betteroff.finance/v1/tools/<tool>`, the same tools the BetterOff MCP server offers. Its commands and flags come from the public spec at [`/openapi/tools.json`](https://api.betteroff.finance/openapi/tools.json), cached for an hour in `~/.cache/betteroff`. A new read tool in BetterOff shows up as a command without a CLI update.
 
-Only tools the spec marks read-only become commands. Tools that propose changes are left out, even if the spec labels one read-only by mistake. BetterOff enforces the real limit: a browser sign-in can only get read scopes, and an API token has the scopes you gave it, so give it read scopes only.
+Only tools the spec marks read-only become commands. Tools that propose changes are left out, even if the spec labels one read-only by mistake. The one exception is `agents run`, which calls `betteroff_run_agent` by name. BetterOff enforces the real limit: a browser sign-in can only get read scopes, and an API token has the scopes you gave it, so give it read scopes only.
 
 ## Compatibility
 

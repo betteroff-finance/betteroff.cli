@@ -104,6 +104,7 @@ const deps: CliDeps = {
 	openBrowser,
 	withLock: fileLock(cacheDir, join(cacheDir, "token.lock")),
 	signInTimeoutMs: 5 * 60 * 1000,
+	sleep: (ms) => Bun.sleep(ms),
 };
 
 process.exitCode = await run(process.argv.slice(2), deps);

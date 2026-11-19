@@ -74,6 +74,8 @@ export type CliDeps = {
 	withLock: <T>(action: () => Promise<T>) => Promise<T>;
 	/** How long to wait for the user to finish signing in. */
 	signInTimeoutMs: number;
+	/** Waits between checks on an agent run. */
+	sleep: (ms: number) => Promise<void>;
 };
 
 export type CallbackServer = {
@@ -345,7 +347,7 @@ async function parseWithFreshSpec(deps: CliDeps, loaded: LoadedTools, tool: Tool
 }
 
 function usage(tools: Tool[], style: Style): string {
-	const width = Math.max(...tools.map((tool) => tool.command.length));
+	const width = Math.max("agents run".length, ...tools.map((tool) => tool.command.length));
 
 	const lines = [
 		`${style.bold("betteroff")} ${VERSION}  Read your BetterOff household from the terminal.`,
@@ -359,6 +361,7 @@ function usage(tools: Tool[], style: Style): string {
 			(tool) =>
 				`  ${tool.command.padEnd(width)}  ${tool.summary}${tool.deprecated ? " (deprecated)" : ""}`,
 		),
+		`  ${"agents run".padEnd(width)}  Start an agent now: betteroff agents run <name> [--wait]`,
 		"",
 		style.bold("Account"),
 		`  ${"login".padEnd(width)}  Sign in with your browser (--token to paste an API token)`,
@@ -370,7 +373,9 @@ function usage(tools: Tool[], style: Style): string {
 		"  --help     Show help for a command",
 		"  --version  Show the CLI version",
 		"",
-		style.dim("Read-only: this CLI cannot move money, change records, or approve anything."),
+		style.dim(
+			"This CLI cannot move money or approve anything. Only `agents run` starts work: the agent files findings and prepares corrections for you to approve in BetterOff.",
+		),
 	];
 
 	return `${lines.join("\n")}\n`;
@@ -468,15 +473,7 @@ async function tokenLogin(deps: CliDeps): Promise<number> {
 	const check = await callTool(
 		deps,
 		token,
-		{
-			name: "betteroff_get_setup_status",
-			command: "setup-status",
-			aliases: [],
-			summary: "",
-			description: "",
-			deprecated: false,
-			flags: [],
-		},
+		namedTool("betteroff_get_setup_status", "setup-status"),
 		{},
 	);
 
@@ -681,6 +678,111 @@ async function status(deps: CliDeps, flags: string[]): Promise<number> {
 	return 0;
 }
 
+/** Calls a tool with the saved sign-in; a browser sign-in is renewed once if the API rejects it. */
+async function signedInCall(deps: CliDeps, tool: Tool, args: JsonValue) {
+	const resolved = await resolveToken(deps);
+
+	if (!resolved) throw new ApiError("Not signed in. Run: betteroff login");
+
+	let result = await callTool(deps, resolved.token, tool, args);
+
+	// A browser sign-in's access token can be revoked or expire early; renew it once and retry.
+	if (result.status === 401 && resolved.renew) {
+		const renewed = await resolved.renew();
+
+		if (renewed) result = await callTool(deps, renewed, tool, args);
+	}
+
+	return result;
+}
+
+function printResult(deps: CliDeps, body: JsonValue, json: boolean, style: Style) {
+	if (json || !deps.stdoutIsTTY) deps.stdout(`${safeJson(JSON.stringify(body, null, 2))}\n`);
+	else deps.stdout(renderPretty(body, deps.columns, style));
+}
+
+/** A tool the CLI calls by name rather than from the spec. */
+function namedTool(name: string, command: string): Tool {
+	return { name, command, aliases: [], summary: "", description: "", deprecated: false, flags: [] };
+}
+
+const AGENTS_RUN_USAGE = [
+	"Usage: betteroff agents run <name> [--wait]",
+	"",
+	"Starts one of your BetterOff agents now: chief, scout, bookkeeper, forecaster, taxman, coach,",
+	"or negotiator. It prints the run id; with --wait it waits for the run (a minute or two) and",
+	"prints its summary and findings. Read a run later with: betteroff agent-run --run-id <id>",
+	"",
+	"An agent reads your data, files findings to To-Do, and prepares corrections for you to approve.",
+	"It never moves money or sends anything. One run per agent per ten minutes.",
+].join("\n");
+
+const runStartedSchema = z.looseObject({ runId: z.string() });
+
+const runStatusSchema = z.looseObject({ run: z.looseObject({ status: z.string() }) });
+
+/** How often, and how long, --wait checks on a run. */
+const RUN_POLL_MS = 5000;
+const RUN_WAIT_MS = 5 * 60 * 1000;
+
+async function agentsRun(
+	deps: CliDeps,
+	flags: string[],
+	json: boolean,
+	style: Style,
+): Promise<number> {
+	const wait = flags.includes("--wait");
+	const names = flags.filter((flag) => flag !== "--wait");
+	const [name] = names;
+
+	if (names.length !== 1 || name === undefined || name.startsWith("-"))
+		throw new UsageError(AGENTS_RUN_USAGE);
+
+	const started = await signedInCall(deps, namedTool("betteroff_run_agent", "agents run"), {
+		agent: name,
+	});
+
+	if (!started.ok)
+		throw new ApiError(errorMessage(started.status, started.body, started.retryAfter));
+
+	const runId = runStartedSchema.safeParse(started.body).data?.runId;
+
+	if (!wait || runId === undefined) {
+		printResult(deps, started.body, json, style);
+
+		if (runId !== undefined && !json)
+			deps.stderr(`Read it when it finishes: betteroff agent-run --run-id ${safeText(runId)}\n`);
+
+		return 0;
+	}
+
+	const readRun = namedTool("betteroff_get_agent_run", "agent-run");
+	const deadline = deps.now() + RUN_WAIT_MS;
+
+	deps.stderr("Waiting for the run to finish…\n");
+
+	while (true) {
+		await deps.sleep(RUN_POLL_MS);
+
+		const report = await signedInCall(deps, readRun, { runId });
+
+		if (!report.ok) throw new ApiError(errorMessage(report.status, report.body, report.retryAfter));
+
+		const status = runStatusSchema.safeParse(report.body).data?.run.status;
+
+		if (status !== "running" || deps.now() >= deadline) {
+			if (status === "running")
+				deps.stderr(
+					`Still running. Read it later: betteroff agent-run --run-id ${safeText(runId)}\n`,
+				);
+
+			printResult(deps, report.body, json, style);
+
+			return 0;
+		}
+	}
+}
+
 export async function run(argv: string[], deps: CliDeps): Promise<number> {
 	const style = deps.stdoutIsTTY && !deps.env.NO_COLOR ? ansiStyle : plainStyle;
 	const json = argv.includes("--json");
@@ -707,6 +809,16 @@ export async function run(argv: string[], deps: CliDeps): Promise<number> {
 
 		if (command === "logout") return await logout(deps, flags);
 
+		if (command === "agents" && flags[0] === "run") {
+			if (help) {
+				deps.stdout(`${AGENTS_RUN_USAGE}\n`);
+
+				return 0;
+			}
+
+			return await agentsRun(deps, flags.slice(1), json, style);
+		}
+
 		const loaded = await loadTools(deps);
 		const { tools } = loaded;
 
@@ -727,18 +839,7 @@ export async function run(argv: string[], deps: CliDeps): Promise<number> {
 		}
 
 		const { tool, args } = await parseWithFreshSpec(deps, loaded, found, flags);
-		const resolved = await resolveToken(deps);
-
-		if (!resolved) throw new ApiError("Not signed in. Run: betteroff login");
-
-		let result = await callTool(deps, resolved.token, tool, args);
-
-		// A browser sign-in's access token can be revoked or expire early; renew it once and retry.
-		if (result.status === 401 && resolved.renew) {
-			const renewed = await resolved.renew();
-
-			if (renewed) result = await callTool(deps, renewed, tool, args);
-		}
+		const result = await signedInCall(deps, tool, args);
 
 		// On stderr, so piped JSON stays exact.
 		if (result.sunset)
@@ -748,9 +849,7 @@ export async function run(argv: string[], deps: CliDeps): Promise<number> {
 
 		if (!result.ok) throw new ApiError(errorMessage(result.status, result.body, result.retryAfter));
 
-		if (json || !deps.stdoutIsTTY)
-			deps.stdout(`${safeJson(JSON.stringify(result.body, null, 2))}\n`);
-		else deps.stdout(renderPretty(result.body, deps.columns, style));
+		printResult(deps, result.body, json, style);
 
 		return 0;
 	} catch (error) {

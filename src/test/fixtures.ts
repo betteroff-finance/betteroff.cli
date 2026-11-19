@@ -92,6 +92,21 @@ export const fixtureSpec: JsonObject = {
 				},
 			},
 		},
+		"/v1/tools/betteroff_list_agents": tool("betteroff_list_agents", true, {
+			type: "object",
+			properties: {},
+		}),
+		"/v1/tools/betteroff_get_agent_run": tool("betteroff_get_agent_run", true, {
+			type: "object",
+			properties: { runId: { type: "string" } },
+			required: ["runId"],
+		}),
+		// A write tool: no command of its own; `agents run` calls it by name.
+		"/v1/tools/betteroff_run_agent": tool("betteroff_run_agent", false, {
+			type: "object",
+			properties: { agent: { type: "string" } },
+			required: ["agent"],
+		}),
 		"/v1/tools/betteroff_request_transfer": tool("betteroff_request_transfer", false, {
 			type: "object",
 			properties: { amountUsdc: { type: "string" } },
@@ -161,6 +176,7 @@ export function fakeDeps(respond: Responder, overrides: Partial<CliDeps> = {}) {
 		openBrowser: async () => true,
 		withLock: (action) => action(),
 		signInTimeoutMs: 1000,
+		sleep: async () => {},
 		...overrides,
 	};
 
