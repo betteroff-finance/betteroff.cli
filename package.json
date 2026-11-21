@@ -11,8 +11,10 @@
 	},
 	"scripts": {
 		"build": "bun build src/main.ts --compile --no-compile-autoload-bunfig --no-compile-autoload-dotenv --minify --outfile dist/betteroff",
+		"check:help-voice": "bun scripts/check-help-voice.ts",
 		"lint": "biome check . --diagnostic-level=error",
 		"test": "bun test src/test",
+		"test:output": "bun test src/test/output.test.ts",
 		"typecheck": "tsc -p tsconfig.json"
 	},
 	"dependencies": {

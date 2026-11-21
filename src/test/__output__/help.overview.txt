@@ -1,0 +1,13 @@
+$ betteroff overview --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff overview␛[22m  Get overview
+
+Use this when the user asks for a household financial overview or data coverage. Get a compact
+household picture: latest stored valuation, account coverage, canonical ledger review counts, and
+the masked login and household name. No provider refresh.
+
+␛[2mAlso: betteroff get-overview␛[22m
+
+--- stderr

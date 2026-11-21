@@ -1,0 +1,15 @@
+$ betteroff chief-list
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[2mWeek␛[22m  2026-W45
+
+␛[1mItems␛[22m
+␛[1m  Title                           Due date    Rank  Agent␛[22m
+  Pay Rewards Card before Nov 14  2026-11-14  1     Chief
+  Categorize 2 transactions       -           2     Bookkeeper
+
+␛[2mNote: Scout has not run this week.␛[22m
+␛[2mAs of 2026-11-02 14:05 UTC␛[22m
+
+--- stderr

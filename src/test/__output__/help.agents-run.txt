@@ -1,0 +1,14 @@
+$ betteroff agents run --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+Usage: betteroff agents run <name> [--wait]
+
+Starts one of your BetterOff agents now: chief, scout, bookkeeper, forecaster, taxman, coach,
+or negotiator. It prints the run id; with --wait it waits for the run (a minute or two) and
+prints its summary and findings. Read a run later with: betteroff agent-run --run-id <id>
+
+An agent reads your data, files findings to To-Do, and prepares corrections for you to approve.
+It never moves money or sends anything. One run per agent per ten minutes.
+
+--- stderr

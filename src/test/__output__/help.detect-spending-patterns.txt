@@ -1,0 +1,18 @@
+$ betteroff detect-spending-patterns --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff detect-spending-patterns␛[22m  Detect spending patterns
+
+Use this when the user asks about spending habits, trends, or unusual transactions. Detect spending
+patterns: frequent merchants, complete-month trends, and unusual transactions (monthly repeats such
+as rent excluded). Frequent merchants are habits, not bills; use betteroff_list_recurring for
+recurring charges.
+
+␛[1mFlags␛[22m
+  --start-date <text>
+␛[2m      Start date (ISO). Leave out for 6 months ago.␛[22m
+  --end-date <text>
+␛[2m      End date (ISO). Leave out for today.␛[22m
+
+--- stderr

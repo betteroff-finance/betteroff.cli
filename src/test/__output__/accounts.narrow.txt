@@ -1,0 +1,13 @@
+$ betteroff accounts
+# tty, color, columns=60
+# exit 0
+--- stdout
+␛[1mDisplay name                              Balance␛[22m
+Everyday Checking                         $4,210.55
+Rewards Card ••4021                       -$1,289.30
+Brokerage (joint, long-term holdings ac…  $182,004.10
+␛[2m5 more columns hidden; use --json for everything␛[22m
+
+␛[2mAs of 2026-11-02 14:05 UTC␛[22m
+
+--- stderr

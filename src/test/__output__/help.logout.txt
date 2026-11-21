@@ -1,0 +1,7 @@
+$ betteroff logout --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+Usage: betteroff logout
+
+--- stderr

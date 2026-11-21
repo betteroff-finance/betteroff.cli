@@ -1,0 +1,27 @@
+$ betteroff activity --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff activity␛[22m  Search activity
+
+Use this when the user asks about recorded account changes or correction proposals. Read recent
+record changes and proposal status, e.g. whether a category, recurring or debt correction the user
+proposed is still pending or was approved. For an account's correction proposals (pending or
+approved), set accountId (via betteroff_list_accounts), actorType=all, action=null; needs
+corrections:prepare. Omits security events and raw fields.
+
+␛[1mFlags␛[22m
+  --account-id <text>
+␛[2m      An account id from betteroff_list_accounts. Leave out for every account.␛[22m
+  --actor-type <agent|user|system|all>␛[2m  (default: "all")␛[22m
+  --action <text>
+␛[2m      One of: categorize_transaction, update_transaction, classify_recurring, confirm_debt_details,␛[22m
+␛[2m      apply_correction, undo_correction␛[22m
+  --limit <integer>
+  --before <json>
+␛[2m      Pass page.nextCursor from the previous result unchanged, for example␛[22m
+␛[2m      {"timestamp":"2026-01-31T12:00:00.000Z","id":"<uuid>"}. Leave out for the first page.␛[22m
+
+␛[2mAlso: betteroff search-activity␛[22m
+
+--- stderr

@@ -1,0 +1,17 @@
+$ betteroff agent-run --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff agent-run␛[22m  Get an agent run
+
+Reads one agent run: its status (running, completed, failed, skipped), its summary, and the open
+findings the agent filed since the run started, each with its amount and due date. Call it with the
+runId from betteroff_run_agent; while status is running, wait a minute and call again.
+
+␛[1mFlags␛[22m
+  --run-id <text>  ␛[1m(required)␛[22m
+␛[2m      The runId betteroff_run_agent or betteroff_list_agents returned.␛[22m
+
+␛[2mAlso: betteroff get-agent-run␛[22m
+
+--- stderr

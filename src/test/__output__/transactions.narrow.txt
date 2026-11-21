@@ -1,0 +1,21 @@
+$ betteroff transactions
+# tty, color, columns=60
+# exit 0
+--- stdout
+␛[1mTransactions␛[22m
+␛[1m  Merchant          Amount     Date        Category␛[22m
+  Café Lumière      -$18.40    2026-11-01  FOOD_AND_DRINK
+  Acme Payroll�[2J  $3,125.00  2026-10-31  INCOME
+  -                 -$1.00     2026-10-30  -
+  ␛[2m3 more columns hidden; use --json for everything␛[22m
+
+␛[1mSummary␛[22m
+  ␛[2mCount  ␛[22m  3
+  ␛[2mTotal  ␛[22m  $3,105.60
+  ␛[2mInflow ␛[22m  $3,125.00
+  ␛[2mOutflow␛[22m  -$19.40
+
+␛[2mShowing 3 of 41. Next page: --cursor '{"offset":3}'␛[22m
+␛[2mAs of 2026-11-02 14:05 UTC␛[22m
+
+--- stderr

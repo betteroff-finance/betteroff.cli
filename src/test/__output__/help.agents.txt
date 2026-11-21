@@ -1,0 +1,15 @@
+$ betteroff agents --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff agents␛[22m  List agents
+
+Lists the household's BetterOff agents (Chief, Scout, Bookkeeper, Forecaster, Taxman, Coach,
+Negotiator): what each one does, its schedule, whether the household's plan includes it, and its
+last run with its summary. Chief reads every other agent's findings and ranks them, so start with
+Chief when the user asks what to do first. Agents only read data, file findings to To-Do, and
+prepare corrections; they never move money or send anything.
+
+␛[2mAlso: betteroff list-agents␛[22m
+
+--- stderr

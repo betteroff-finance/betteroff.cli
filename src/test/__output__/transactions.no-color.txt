@@ -1,0 +1,20 @@
+$ betteroff transactions
+# tty, NO_COLOR=1, columns=100
+# exit 0
+--- stdout
+Transactions
+  Merchant          Amount     Date        Category        Pending  Id     Account id
+  Café Lumière      -$18.40    2026-11-01  FOOD_AND_DRINK  yes      txn_1  acc_2
+  Acme Payroll�[2J  $3,125.00  2026-10-31  INCOME          no       txn_2  acc_1
+  -                 -$1.00     2026-10-30  -               no       txn_3  acc_1
+
+Summary
+  Count    3
+  Total    $3,105.60
+  Inflow   $3,125.00
+  Outflow  -$19.40
+
+Showing 3 of 41. Next page: --cursor '{"offset":3}'
+As of 2026-11-02 14:05 UTC
+
+--- stderr

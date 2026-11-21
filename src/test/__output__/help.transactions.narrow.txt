@@ -1,0 +1,103 @@
+$ betteroff transactions --help
+# tty, color, columns=60
+# exit 0
+--- stdout
+␛[1mbetteroff transactions␛[22m  Search transactions
+
+Use this when the user asks to find transactions or total a
+filtered set of transactions. Search transactions by date,
+merchant, category, trait, type/class, account, amount, or
+whether they need a category; a summary totals all matches.
+Brokerage deposits/withdrawals: transactionClass
+`brokerage`, transactionTypes
+`transfer_in`/`transfer_out`/`deposit`/`withdrawal`.
+
+␛[1mFlags␛[22m
+  --all-time
+␛[2m      Use true for all synced merchant history; dates are␛[22m
+␛[2m      ignored. Use it when the answer may be older than the␛[22m
+␛[2m      default 30 days: the last or first time, ever, annual␛[22m
+␛[2m      or one-off charges, or 'did I pay X before'.␛[22m
+  --cursor <text>
+␛[2m      Pass page.nextCursor unchanged, with the same filters.␛[22m
+␛[2m      Leave out for the first page.␛[22m
+  --start-date <text>
+␛[2m      Start date (ISO format, e.g. 2025-01-01). Leave out␛[22m
+␛[2m      for 30 days ago.␛[22m
+  --end-date <text>
+␛[2m      End date (ISO format). Leave out for today.␛[22m
+  --merchant <text>
+␛[2m      Merchant name to search for (partial match).␛[22m
+  --traits <a,b>
+␛[2m      Only transactions whose merchant has every listed␛[22m
+␛[2m      trait. Use for purposes a category does not capture.␛[22m
+␛[2m      discretionary: optional spending: dining out,␛[22m
+␛[2m      entertainment, hobbies, shopping for wants; travel:␛[22m
+␛[2m      trips: flights, hotels, rental cars, cruises, travel␛[22m
+␛[2m      booking; health: medical care: doctors, dentists,␛[22m
+␛[2m      pharmacies, vision, therapy; kids: children:␛[22m
+␛[2m      childcare, schools, tutoring, toys, kids' activities;␛[22m
+␛[2m      gifts: gifts: florists, gift shops, gift cards;␛[22m
+␛[2m      charity: donations: charities, nonprofits, religious␛[22m
+␛[2m      organizations, fundraisers; business: work expenses:␛[22m
+␛[2m      software, office supplies, coworking, professional␛[22m
+␛[2m      services; crypto: crypto: exchanges, on-ramps,␛[22m
+␛[2m      wallets, crypto cards. Person-to-person payments and␛[22m
+␛[2m      unrecognized merchants carry no traits. Leave out for␛[22m
+␛[2m      no trait filter.␛[22m
+␛[2m      One of: discretionary, travel, health, kids, gifts,␛[22m
+␛[2m      charity, business, crypto␛[22m
+  --category <text>
+␛[2m      Category code (e.g. FOOD_AND_DRINK, TRANSPORTATION,␛[22m
+␛[2m      ENTERTAINMENT).␛[22m
+  --transaction-types <a,b>
+␛[2m      Filter by transaction type. Bank and card income␛[22m
+␛[2m      (paychecks, benefits) is type deposit with category␛[22m
+␛[2m      INCOME; for income totals use betteroff_get_cash_flow,␛[22m
+␛[2m      and to list income rows use category INCOME. fee and␛[22m
+␛[2m      interest_payment also match the bank-fees category, so␛[22m
+␛[2m      card interest charges and ATM fees are found. For␛[22m
+␛[2m      investment account deposits/withdrawals, use␛[22m
+␛[2m      transfer_in/deposit/bank_deposit for deposits and␛[22m
+␛[2m      transfer_out/withdrawal/bank_withdrawal for␛[22m
+␛[2m      withdrawals.␛[22m
+␛[2m      One of: bank_deposit, bank_withdrawal, card_charge,␛[22m
+␛[2m      card_refund, ach_transfer, wire, check, atm, cash,␛[22m
+␛[2m      interest_payment, fee, buy, sell, short_sell,␛[22m
+␛[2m      buy_to_cover, swap, dividend, qualified_dividend,␛[22m
+␛[2m      capital_gain_distribution, return_of_capital,␛[22m
+␛[2m      interest, bond_coupon, airdrop, fork, staking_reward,␛[22m
+␛[2m      mining_reward, lending_reward, nft_mint, nft_sale,␛[22m
+␛[2m      nft_purchase, lp_mint, lp_burn, lending_supply,␛[22m
+␛[2m      lending_borrow, lending_repay, transfer, bridge_out,␛[22m
+␛[2m      bridge_in, split, spin_off, merger_proceeds,␛[22m
+␛[2m      rights_issue, manual_valuation_change, other, payment,␛[22m
+␛[2m      refund, deposit, withdrawal, receive, send,␛[22m
+␛[2m      transfer_in, transfer_out␛[22m
+  --needs-review
+␛[2m      Use true to list posted transactions that need a␛[22m
+␛[2m      category: no category, OTHER or UNCATEGORIZED, or an␛[22m
+␛[2m      automatic category below 50% confidence that nobody␛[22m
+␛[2m      confirmed. Ledger review items (unmatched transfers,␛[22m
+␛[2m      unnamed assets) are counted by cause in␛[22m
+␛[2m      betteroff_get_overview ledger.reviewGroups. Leave out␛[22m
+␛[2m      for no filter.␛[22m
+  --transaction-class <bank|brokerage|crypto_exchange|blockchain_wallet>
+␛[2m      Filter by normalized transaction class. Use brokerage␛[22m
+␛[2m      for investment accounts.␛[22m
+  --account-id <text>
+␛[2m      Filter to a specific account by ID. Leave out for␛[22m
+␛[2m      search all accounts.␛[22m
+  --min-amount <json>
+␛[2m      Minimum transaction amount, as a number or decimal␛[22m
+␛[2m      text. Must not exceed maxAmount.␛[22m
+  --max-amount <json>
+␛[2m      Maximum transaction amount, as a number or decimal␛[22m
+␛[2m      text.␛[22m
+  --limit <integer>
+␛[2m      Max results to return (default 25, max 50). Leave out␛[22m
+␛[2m      for 25.␛[22m
+
+␛[2mAlso: betteroff search-transactions␛[22m
+
+--- stderr

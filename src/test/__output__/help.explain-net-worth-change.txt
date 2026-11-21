@@ -1,0 +1,21 @@
+$ betteroff explain-net-worth-change --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff explain-net-worth-change␛[22m  Explain net worth change
+
+Use this when the user asks what caused net worth to change between two dates. Reconcile two stored
+net-worth valuations using asset and liability changes.
+
+␛[1mFlags␛[22m
+  --period <this_month|last_month|last_30d>
+␛[2m      A named period resolved in the household's calendar: this_month (end of last month to the␛[22m
+␛[2m      latest valuation), last_month (end of the month before last to the end of last month),␛[22m
+␛[2m      last_30d (30 days ago to the latest valuation). When set, startDate and endDate are ignored.␛[22m
+␛[2m      Leave out for pass dates.␛[22m
+  --start-date <text>
+␛[2m      Earlier date, YYYY-MM-DD, for example 2026-01-01. Null when period is set.␛[22m
+  --end-date <text>
+␛[2m      Later date, YYYY-MM-DD, for example 2026-06-30. Null when period is set.␛[22m
+
+--- stderr

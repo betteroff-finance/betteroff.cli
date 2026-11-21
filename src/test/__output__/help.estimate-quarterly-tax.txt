@@ -1,0 +1,30 @@
+$ betteroff estimate-quarterly-tax --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff estimate-quarterly-tax␛[22m  Estimate quarterly tax
+
+Use this when the user asks how much federal estimated tax to pay each quarter or about safe harbor.
+Compute US federal quarterly estimated tax by safe harbor from figures the user states. Ask for
+missing figures; never guess. Pass filingStatus only when the user stated it; otherwise null.
+
+␛[1mFlags␛[22m
+  --tax-year <integer>  ␛[1m(required)␛[22m
+␛[2m      Tax year being estimated, e.g. 2026.␛[22m
+  --filing-status <single|joint|separate|head|surviving>
+  --prior-year-tax <json>
+␛[2m      Total tax on last year's return (Form 1040 line 24).␛[22m
+  --prior-year-agi <json>
+␛[2m      Adjusted gross income on last year's return.␛[22m
+  --projected-tax <json>
+␛[2m      This year's projected total tax, if the user has one.␛[22m
+  --projected-agi <json>
+␛[2m      This year's projected adjusted gross income.␛[22m
+  --itemized-deductions <json>
+␛[2m      Projected itemized deductions; null uses the standard.␛[22m
+  --expected-withholding <json>
+␛[2m      Federal tax withheld from pay this year, projected.␛[22m
+  --estimated-payments-made <json>
+␛[2m      Estimated payments already made for this tax year.␛[22m
+
+--- stderr

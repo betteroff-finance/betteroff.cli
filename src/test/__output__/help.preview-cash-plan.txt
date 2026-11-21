@@ -1,0 +1,26 @@
+$ betteroff preview-cash-plan --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff preview-cash-plan␛[22m  Preview cash plan
+
+Use this when the user wants a cash-plan scenario after confirming the available cash, upcoming
+obligations, spending allowance and buffer. Calculate a read-only USD cash-plan scenario from inputs
+the customer explicitly confirmed. Never invent a balance, buffer, spending allowance, bill or
+confirmation. Does not reserve or move money.
+
+␛[1mFlags␛[22m
+  --account <text>  ␛[1m(required)␛[22m
+  --currency <text>  ␛[1m(required)␛[22m
+  --start-date <text>  ␛[1m(required)␛[22m
+  --end-date <text>  ␛[1m(required)␛[22m
+  --available-cents <integer>
+  --balance-observed-at <text>
+  --balance-excludes-credit
+  --spending-allowance-cents <integer>
+  --buffer-cents <integer>
+  --obligations-confirmed  ␛[1m(required)␛[22m
+  --commitments-confirmed  ␛[1m(required)␛[22m
+  --items <json>  ␛[1m(required)␛[22m
+
+--- stderr

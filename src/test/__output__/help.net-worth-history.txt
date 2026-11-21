@@ -1,0 +1,25 @@
+$ betteroff net-worth-history --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff net-worth-history␛[22m  Get net worth history
+
+Use this when the user asks how net worth changed or moved over time, such as this year or since a
+date: a trend, not a cause. Read stored household valuations over time, paged by cursor. Only for
+what caused a change between two dates, use betteroff_explain_net_worth_change.
+
+␛[1mFlags␛[22m
+  --period <7d|30d|90d|1y|all>
+␛[2m      Time period for the trend. Use '7d' for last week, '30d' for last month, '90d' for last␛[22m
+␛[2m      quarter, '1y' for the last year, 'all' for all history, or null for '30d'. If history is␛[22m
+␛[2m      shorter than the period asked for, say so instead of calling it that period.␛[22m
+  --cursor <json>
+␛[2m      Pass page.nextCursor from the previous result unchanged, with the same other arguments. Omit␛[22m
+␛[2m      or use null for the first page.␛[22m
+  --limit <integer>
+␛[2m      Points per page, 1 to 60, for example 30, to page through every valuation. Leave out for get␛[22m
+␛[2m      the whole period sampled to at most 60 points (for charts and summaries).␛[22m
+
+␛[2mAlso: betteroff get-net-worth-history␛[22m
+
+--- stderr

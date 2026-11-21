@@ -1,0 +1,2552 @@
+{
+	"info": {
+		"version": "0.8.12+10d5cd27"
+	},
+	"paths": {
+		"/v1/tools/betteroff_get_overview": {
+			"post": {
+				"operationId": "betteroff_get_overview",
+				"summary": "Get overview",
+				"description": "Use this when the user asks for a household financial overview or data coverage. Get a compact household picture: latest stored valuation, account coverage, canonical ledger review counts, and the masked login and household name. No provider refresh.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {},
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_get_setup_status": {
+			"post": {
+				"operationId": "betteroff_get_setup_status",
+				"summary": "Get setup status",
+				"description": "Use this when the user asks what is left to set up, wants to connect a bank or add a manual item, whether billing is active, or which connections need reconnecting. Cheap status check: whether this connection works, which permissions it has, and whether any accounts are connected. Returns billing state, account coverage, connections to reconnect, and sign-in-protected links for the user to connect a bank or add a manual item. Access issues link to support, not checkout. This tool cannot start checkout, connect accounts, or change agent access.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {},
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_list_accounts": {
+			"post": {
+				"operationId": "betteroff_list_accounts",
+				"summary": "List accounts",
+				"description": "Use this when the user asks which accounts are connected or wants account balances. Get the user's connected accounts with balances, types, and institutions.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"accountType": {
+										"description": "Filter by account type; wallet means on-chain wallets, crypto adds exchanges. Omit or use null to get all accounts.",
+										"anyOf": [
+											{
+												"type": "string",
+												"enum": ["depository", "investment", "credit", "loan", "crypto", "wallet"]
+											},
+											{
+												"type": "null"
+											}
+										]
+									}
+								},
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_get_net_worth_history": {
+			"post": {
+				"operationId": "betteroff_get_net_worth_history",
+				"summary": "Get net worth history",
+				"description": "Use this when the user asks how net worth changed or moved over time, such as this year or since a date: a trend, not a cause. Read stored household valuations over time, paged by cursor. Only for what caused a change between two dates, use betteroff_explain_net_worth_change.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"period": {
+										"anyOf": [
+											{
+												"type": "string",
+												"enum": ["7d", "30d", "90d", "1y", "all"]
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Time period for the trend. Use '7d' for last week, '30d' for last month, '90d' for last quarter, '1y' for the last year, 'all' for all history, or null for '30d'. If history is shorter than the period asked for, say so instead of calling it that period."
+									},
+									"cursor": {
+										"description": "Pass page.nextCursor from the previous result unchanged, with the same other arguments. Omit or use null for the first page.",
+										"anyOf": [
+											{
+												"type": "object",
+												"properties": {
+													"offset": {
+														"type": "integer",
+														"minimum": 0,
+														"maximum": 9007199254740991
+													},
+													"revision": {
+														"type": "integer",
+														"minimum": -9007199254740991,
+														"maximum": 9007199254740991
+													}
+												},
+												"required": ["offset", "revision"]
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"limit": {
+										"description": "Points per page, 1 to 60, for example 30, to page through every valuation. Use null to get the whole period sampled to at most 60 points (for charts and summaries).",
+										"anyOf": [
+											{
+												"type": "integer",
+												"minimum": 1,
+												"maximum": 60
+											},
+											{
+												"type": "null"
+											}
+										]
+									}
+								},
+								"required": ["period"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_explain_net_worth_change": {
+			"post": {
+				"operationId": "betteroff_explain_net_worth_change",
+				"summary": "Explain net worth change",
+				"description": "Use this when the user asks what caused net worth to change between two dates. Reconcile two stored net-worth valuations using asset and liability changes.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"period": {
+										"default": null,
+										"description": "A named period resolved in the household's calendar: this_month (end of last month to the latest valuation), last_month (end of the month before last to the end of last month), last_30d (30 days ago to the latest valuation). When set, startDate and endDate are ignored. Use null to pass dates.",
+										"anyOf": [
+											{
+												"type": "string",
+												"enum": ["this_month", "last_month", "last_30d"]
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"startDate": {
+										"default": null,
+										"description": "Earlier date, YYYY-MM-DD, for example 2026-01-01. Null when period is set.",
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "date",
+												"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"endDate": {
+										"default": null,
+										"description": "Later date, YYYY-MM-DD, for example 2026-06-30. Null when period is set.",
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "date",
+												"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+											},
+											{
+												"type": "null"
+											}
+										]
+									}
+								},
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_search_transactions": {
+			"post": {
+				"operationId": "betteroff_search_transactions",
+				"summary": "Search transactions",
+				"description": "Use this when the user asks to find transactions or total a filtered set of transactions. Search transactions by date, merchant, category, trait, type/class, account, amount, or whether they need a category; a summary totals all matches. Brokerage deposits/withdrawals: transactionClass `brokerage`, transactionTypes `transfer_in`/`transfer_out`/`deposit`/`withdrawal`.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"allTime": {
+										"default": null,
+										"description": "Use true for all synced merchant history; dates are ignored. Use it when the answer may be older than the default 30 days: the last or first time, ever, annual or one-off charges, or 'did I pay X before'.",
+										"type": ["boolean", "null"]
+									},
+									"cursor": {
+										"default": null,
+										"description": "Pass page.nextCursor unchanged, with the same filters. Use null for the first page.",
+										"anyOf": [
+											{
+												"type": "string",
+												"maxLength": 256
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"startDate": {
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "date",
+												"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Start date (ISO format, e.g. 2025-01-01). Use null for 30 days ago."
+									},
+									"endDate": {
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "date",
+												"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "End date (ISO format). Use null for today."
+									},
+									"merchant": {
+										"description": "Merchant name to search for (partial match).",
+										"type": ["string", "null"]
+									},
+									"traits": {
+										"anyOf": [
+											{
+												"type": "array",
+												"items": {
+													"type": "string",
+													"enum": [
+														"discretionary",
+														"travel",
+														"health",
+														"kids",
+														"gifts",
+														"charity",
+														"business",
+														"crypto"
+													]
+												}
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Only transactions whose merchant has every listed trait. Use for purposes a category does not capture. discretionary: optional spending: dining out, entertainment, hobbies, shopping for wants; travel: trips: flights, hotels, rental cars, cruises, travel booking; health: medical care: doctors, dentists, pharmacies, vision, therapy; kids: children: childcare, schools, tutoring, toys, kids' activities; gifts: gifts: florists, gift shops, gift cards; charity: donations: charities, nonprofits, religious organizations, fundraisers; business: work expenses: software, office supplies, coworking, professional services; crypto: crypto: exchanges, on-ramps, wallets, crypto cards. Person-to-person payments and unrecognized merchants carry no traits. Use null for no trait filter."
+									},
+									"category": {
+										"description": "Category code (e.g. FOOD_AND_DRINK, TRANSPORTATION, ENTERTAINMENT).",
+										"type": ["string", "null"]
+									},
+									"transactionTypes": {
+										"anyOf": [
+											{
+												"type": "array",
+												"items": {
+													"type": "string",
+													"enum": [
+														"bank_deposit",
+														"bank_withdrawal",
+														"card_charge",
+														"card_refund",
+														"ach_transfer",
+														"wire",
+														"check",
+														"atm",
+														"cash",
+														"interest_payment",
+														"fee",
+														"buy",
+														"sell",
+														"short_sell",
+														"buy_to_cover",
+														"swap",
+														"dividend",
+														"qualified_dividend",
+														"capital_gain_distribution",
+														"return_of_capital",
+														"interest",
+														"bond_coupon",
+														"airdrop",
+														"fork",
+														"staking_reward",
+														"mining_reward",
+														"lending_reward",
+														"nft_mint",
+														"nft_sale",
+														"nft_purchase",
+														"lp_mint",
+														"lp_burn",
+														"lending_supply",
+														"lending_borrow",
+														"lending_repay",
+														"transfer",
+														"bridge_out",
+														"bridge_in",
+														"split",
+														"spin_off",
+														"merger_proceeds",
+														"rights_issue",
+														"manual_valuation_change",
+														"other",
+														"payment",
+														"refund",
+														"deposit",
+														"withdrawal",
+														"receive",
+														"send",
+														"transfer_in",
+														"transfer_out"
+													]
+												}
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Filter by transaction type. Bank and card income (paychecks, benefits) is type deposit with category INCOME; for income totals use betteroff_get_cash_flow, and to list income rows use category INCOME. fee and interest_payment also match the bank-fees category, so card interest charges and ATM fees are found. For investment account deposits/withdrawals, use transfer_in/deposit/bank_deposit for deposits and transfer_out/withdrawal/bank_withdrawal for withdrawals."
+									},
+									"needsReview": {
+										"default": null,
+										"description": "Use true to list posted transactions that need a category: no category, OTHER or UNCATEGORIZED, or an automatic category below 50% confidence that nobody confirmed. Ledger review items (unmatched transfers, unnamed assets) are counted by cause in betteroff_get_overview ledger.reviewGroups. Use null for no filter.",
+										"type": ["boolean", "null"]
+									},
+									"transactionClass": {
+										"anyOf": [
+											{
+												"type": "string",
+												"enum": ["bank", "brokerage", "crypto_exchange", "blockchain_wallet"]
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Filter by normalized transaction class. Use brokerage for investment accounts."
+									},
+									"accountId": {
+										"description": "Filter to a specific account by ID. Use null to search all accounts.",
+										"type": ["string", "null"]
+									},
+									"minAmount": {
+										"anyOf": [
+											{
+												"anyOf": [
+													{
+														"type": "number"
+													},
+													{
+														"type": "string",
+														"pattern": "^-?\\d+(\\.\\d+)?$"
+													}
+												]
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Minimum transaction amount, as a number or decimal text. Must not exceed maxAmount."
+									},
+									"maxAmount": {
+										"anyOf": [
+											{
+												"anyOf": [
+													{
+														"type": "number"
+													},
+													{
+														"type": "string",
+														"pattern": "^-?\\d+(\\.\\d+)?$"
+													}
+												]
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Maximum transaction amount, as a number or decimal text."
+									},
+									"limit": {
+										"anyOf": [
+											{
+												"type": "integer",
+												"minimum": -9007199254740991,
+												"maximum": 9007199254740991
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Max results to return (default 25, max 50). Use null for 25."
+									}
+								},
+								"required": [
+									"startDate",
+									"endDate",
+									"merchant",
+									"traits",
+									"category",
+									"transactionTypes",
+									"transactionClass",
+									"accountId",
+									"minAmount",
+									"maxAmount",
+									"limit"
+								],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_analyze_spending": {
+			"post": {
+				"operationId": "betteroff_analyze_spending",
+				"summary": "Analyze spending",
+				"description": "Use this when the user asks where money went or compares spending across periods. Read category or merchant spending for a period, optionally against an earlier one. Excludes transfers and loan payments; fees and interest count.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"groupBy": {
+										"type": "string",
+										"enum": ["category", "merchant"]
+									},
+									"startDate": {
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "date",
+												"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Start date (ISO). Use null for start of current month."
+									},
+									"endDate": {
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "date",
+												"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "End date (ISO). Use null for today."
+									},
+									"comparison": {
+										"anyOf": [
+											{
+												"type": "object",
+												"properties": {
+													"startDate": {
+														"type": "string",
+														"format": "date",
+														"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+													},
+													"endDate": {
+														"type": "string",
+														"format": "date",
+														"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+													}
+												},
+												"required": ["startDate", "endDate"]
+											},
+											{
+												"type": "null"
+											}
+										]
+									}
+								},
+								"required": ["startDate", "endDate", "comparison"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_detect_spending_patterns": {
+			"post": {
+				"operationId": "betteroff_detect_spending_patterns",
+				"summary": "Detect spending patterns",
+				"description": "Use this when the user asks about spending habits, trends, or unusual transactions. Detect spending patterns: frequent merchants, complete-month trends, and unusual transactions (monthly repeats such as rent excluded). Frequent merchants are habits, not bills; use betteroff_list_recurring for recurring charges.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"startDate": {
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "date",
+												"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Start date (ISO). Use null for 6 months ago."
+									},
+									"endDate": {
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "date",
+												"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "End date (ISO). Use null for today."
+									}
+								},
+								"required": ["startDate", "endDate"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_get_account_flows": {
+			"post": {
+				"operationId": "betteroff_get_account_flows",
+				"summary": "Get account flows",
+				"description": "Use this when the user asks how much entered or left specific accounts. Gross inflows, gross outflows, and net flow for selected accounts over a date range, aggregated over ALL matches server-side, e.g. 'how much did I deposit into Schwab this year'. Prefer this over betteroff_search_transactions for deposit/withdrawal totals.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"startDate": {
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "date",
+												"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Start date (ISO format, e.g. 2026-01-01). Use null for Jan 1 of this year."
+									},
+									"endDate": {
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "date",
+												"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "End date (ISO format). Use null for today."
+									},
+									"accountIds": {
+										"anyOf": [
+											{
+												"type": "array",
+												"items": {
+													"type": "string"
+												}
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Specific account IDs to include. Use null to select by accountType/institution."
+									},
+									"accountType": {
+										"anyOf": [
+											{
+												"type": "string",
+												"enum": ["depository", "investment", "credit", "loan", "crypto", "wallet"]
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Optional account type filter. Use investment for brokerage/retirement accounts."
+									},
+									"institution": {
+										"description": "Optional institution name filter, e.g. Charles Schwab. Partial matches are accepted.",
+										"type": ["string", "null"]
+									},
+									"direction": {
+										"anyOf": [
+											{
+												"type": "string",
+												"enum": ["all", "inflow", "outflow"]
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Use inflow for deposits only, outflow for withdrawals only, all for both."
+									},
+									"limit": {
+										"anyOf": [
+											{
+												"type": "integer",
+												"minimum": -9007199254740991,
+												"maximum": 9007199254740991
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Max transaction rows to return for evidence (default 25, max 100)."
+									},
+									"cursor": {
+										"description": "Pass page.nextCursor from the previous result unchanged, with the same other arguments. Omit or use null for the first page.",
+										"anyOf": [
+											{
+												"type": "object",
+												"properties": {
+													"offset": {
+														"type": "integer",
+														"minimum": 0,
+														"maximum": 100000
+													},
+													"revision": {
+														"type": "integer",
+														"minimum": -9007199254740991,
+														"maximum": 9007199254740991
+													}
+												},
+												"required": ["offset", "revision"]
+											},
+											{
+												"type": "null"
+											}
+										]
+									}
+								},
+								"required": [
+									"startDate",
+									"endDate",
+									"accountIds",
+									"accountType",
+									"institution",
+									"direction",
+									"limit"
+								],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_get_cash_flow": {
+			"post": {
+				"operationId": "betteroff_get_cash_flow",
+				"summary": "Get cash flow",
+				"description": "Use this when the user asks about income, expenses, or cash flow. Get income vs expenses for a period with prior-period comparison and projections. Use for cash flow, earned vs spent, or saving questions.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"startDate": {
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "date",
+												"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Start date (ISO). Use null for start of current month."
+									},
+									"endDate": {
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "date",
+												"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "End date (ISO). Use null for today."
+									}
+								},
+								"required": ["startDate", "endDate"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_preview_cash_plan": {
+			"post": {
+				"operationId": "betteroff_preview_cash_plan",
+				"summary": "Preview cash plan",
+				"description": "Use this when the user wants a cash-plan scenario after confirming the available cash, upcoming obligations, spending allowance and buffer. Calculate a read-only USD cash-plan scenario from inputs the customer explicitly confirmed. Never invent a balance, buffer, spending allowance, bill or confirmation. Does not reserve or move money.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"account": {
+										"type": "string",
+										"minLength": 1,
+										"maxLength": 160
+									},
+									"currency": {
+										"type": "string",
+										"const": "USD"
+									},
+									"startDate": {
+										"type": "string",
+										"format": "date",
+										"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+									},
+									"endDate": {
+										"type": "string",
+										"format": "date",
+										"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+									},
+									"availableCents": {
+										"anyOf": [
+											{
+												"type": "integer",
+												"minimum": 0,
+												"maximum": 1000000000000
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"balanceObservedAt": {
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "date-time",
+												"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"balanceExcludesCredit": {
+										"type": ["boolean", "null"]
+									},
+									"spendingAllowanceCents": {
+										"anyOf": [
+											{
+												"type": "integer",
+												"minimum": 0,
+												"maximum": 1000000000000
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"bufferCents": {
+										"anyOf": [
+											{
+												"type": "integer",
+												"minimum": 0,
+												"maximum": 1000000000000
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"obligationsConfirmed": {
+										"type": "boolean"
+									},
+									"commitmentsConfirmed": {
+										"type": "boolean"
+									},
+									"items": {
+										"maxItems": 200,
+										"type": "array",
+										"items": {
+											"type": "object",
+											"properties": {
+												"id": {
+													"type": "string",
+													"minLength": 1,
+													"maxLength": 100
+												},
+												"label": {
+													"type": "string",
+													"minLength": 1,
+													"maxLength": 160
+												},
+												"amountCents": {
+													"anyOf": [
+														{
+															"type": "integer",
+															"minimum": 0,
+															"maximum": 1000000000000
+														},
+														{
+															"type": "null"
+														}
+													]
+												},
+												"dueDate": {
+													"anyOf": [
+														{
+															"type": "string",
+															"format": "date",
+															"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+														},
+														{
+															"type": "null"
+														}
+													]
+												},
+												"kind": {
+													"type": "string",
+													"enum": ["bill", "commitment"]
+												},
+												"paid": {
+													"type": "boolean"
+												},
+												"includedInAvailableBalance": {
+													"type": ["boolean", "null"]
+												},
+												"confirmed": {
+													"type": "boolean"
+												}
+											},
+											"required": [
+												"id",
+												"label",
+												"amountCents",
+												"dueDate",
+												"kind",
+												"paid",
+												"includedInAvailableBalance",
+												"confirmed"
+											],
+											"additionalProperties": false
+										}
+									}
+								},
+								"required": [
+									"account",
+									"currency",
+									"startDate",
+									"endDate",
+									"availableCents",
+									"balanceObservedAt",
+									"balanceExcludesCredit",
+									"spendingAllowanceCents",
+									"bufferCents",
+									"obligationsConfirmed",
+									"commitmentsConfirmed",
+									"items"
+								],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_list_recurring": {
+			"post": {
+				"operationId": "betteroff_list_recurring",
+				"summary": "List recurring",
+				"description": "Use this when the user asks about recurring bills, subscriptions, or income. Get recurring bills, subscriptions and income (Plaid-reported and detected streams), without credit card payments. Duplicate streams are merged; ended streams are listed apart in `ended`. Not a payment history (use search_transactions) or proof of insurance coverage.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"coverageDays": {
+										"description": "Compare bills and debt minimums due in this many days with bank cash.",
+										"type": "integer",
+										"minimum": 1,
+										"maximum": 90
+									}
+								},
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_forecast_balances": {
+			"post": {
+				"operationId": "betteroff_forecast_balances",
+				"summary": "Forecast balances",
+				"description": "Use this when the user asks whether a checking or savings account will cover what is due in the next few weeks, or how low an account will get. Project each checking and savings account's balance day by day over the next 14 days (up to 35): the starting balance, every dated bill, card payment and income due from that account, the running balance, and the low point with its date. Computed in code from the account's own recurring streams; use it instead of projecting balances by hand.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"days": {
+										"description": "How many days ahead to project. Defaults to 14.",
+										"type": "integer",
+										"minimum": 1,
+										"maximum": 35
+									}
+								},
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_get_portfolio": {
+			"post": {
+				"operationId": "betteroff_get_portfolio",
+				"summary": "Get portfolio",
+				"description": "Use this when the user asks about investment holdings, allocation, or concentration. Read portfolio positions, allocation, and concentration for the full filtered portfolio. includePositions false returns the allocation summary; true pages positions by cursor.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"symbol": {
+										"description": "Filter by ticker symbol (e.g. AAPL, BTC, ETH). Use null for all symbols.",
+										"type": ["string", "null"]
+									},
+									"instrumentId": {
+										"description": "Filter by canonical instrument ID. Preferred over symbol when available. Use null for all.",
+										"type": ["string", "null"]
+									},
+									"type": {
+										"description": "Filter by holding type (equity, etf, mutual_fund, crypto). Use null for all types.",
+										"type": ["string", "null"]
+									},
+									"groupBy": {
+										"type": "string",
+										"enum": ["type", "account", "symbol", "instrument", "underlying"],
+										"description": "Group by type, account, symbol, separate instrument, or underlying ISIN exposure across brokerage holdings and Stock Tokens."
+									},
+									"includePositions": {
+										"type": "boolean"
+									},
+									"cursor": {
+										"description": "Pass page.nextCursor from the previous result unchanged, with the same other arguments. Omit or use null for the first page.",
+										"anyOf": [
+											{
+												"type": "object",
+												"properties": {
+													"offset": {
+														"type": "integer",
+														"minimum": 0,
+														"maximum": 9007199254740991
+													},
+													"revision": {
+														"type": "integer",
+														"minimum": -9007199254740991,
+														"maximum": 9007199254740991
+													}
+												},
+												"required": ["offset", "revision"]
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"limit": {
+										"anyOf": [
+											{
+												"type": "integer",
+												"minimum": 1,
+												"maximum": 50
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"targets": {
+										"description": "Only targets the user stated, by allocation group name. Never suggest one. Omit to use the household's saved targets.",
+										"maxItems": 20,
+										"type": "array",
+										"items": {
+											"type": "object",
+											"properties": {
+												"group": {
+													"type": "string",
+													"minLength": 1,
+													"maxLength": 80
+												},
+												"percent": {
+													"type": "number",
+													"minimum": 0,
+													"maximum": 100
+												}
+											},
+											"required": ["group", "percent"]
+										}
+									}
+								},
+								"required": [
+									"symbol",
+									"instrumentId",
+									"type",
+									"groupBy",
+									"includePositions",
+									"limit"
+								],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_get_defi_positions": {
+			"post": {
+				"operationId": "betteroff_get_defi_positions",
+				"summary": "Get defi positions",
+				"description": "Use this when the user asks about DeFi, lending, staking, or LP positions, or protocol exposure. DeFi exposure by protocol across chains: total value, position count, per-asset breakdown.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"protocol": {
+										"description": "Filter to a specific protocol name (case-insensitive substring match, e.g. 'aave', 'uniswap'). Use null for all protocols.",
+										"type": ["string", "null"]
+									},
+									"chain": {
+										"description": "Filter to a specific chain slug (e.g. 'ethereum', 'base', 'arbitrum'). Use null for all chains.",
+										"type": ["string", "null"]
+									}
+								},
+								"required": ["protocol", "chain"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_list_debts": {
+			"post": {
+				"operationId": "betteroff_list_debts",
+				"summary": "List debts",
+				"description": "Use this when the user asks what they owe or which debt terms are missing. Get the user's debts (cards and loans): names with last digits, balances with balanceAsOf, APRs, minimum payments, next payment due dates, totals, and a balance-weighted average APR. Use for debt, interest rate, or payoff-priority questions.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {},
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_simulate_debt_payoff": {
+			"post": {
+				"operationId": "betteroff_simulate_debt_payoff",
+				"summary": "Simulate debt payoff",
+				"description": "Use this when the user asks to compare debt payoff strategies. Simulate paying off debts by avalanche (highest APR first) or snowball (smallest balance first), with an optional extra monthly payment. Debts missing a balance, APR, minimum payment, or FX rate are listed in skippedDebts. betteroff_propose_debt_details saves terms the user states. When the user states their debts in the chat (for example a household with nothing connected yet), pass them as `debts` and the projection runs on exactly those numbers instead of stored data; nothing is saved. Read-only; never moves money.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"strategy": {
+										"type": "string",
+										"enum": ["avalanche", "snowball"],
+										"description": "avalanche = highest APR first (minimizes interest); snowball = smallest balance first (faster early wins)."
+									},
+									"extraMonthly": {
+										"description": "Extra amount paid toward debts each month beyond the minimums, in the user's base currency, as a number or decimal text. Use 0 for none.",
+										"anyOf": [
+											{
+												"type": "number"
+											},
+											{
+												"type": "string",
+												"pattern": "^-?\\d+(\\.\\d+)?$"
+											}
+										]
+									},
+									"debts": {
+										"description": "Debts exactly as the user stated them in this chat, in their base currency. Only numbers the user gave; ask for any that are missing rather than guessing. Omit to use the household's stored debts.",
+										"minItems": 1,
+										"maxItems": 50,
+										"type": "array",
+										"items": {
+											"type": "object",
+											"properties": {
+												"name": {
+													"type": "string",
+													"minLength": 1,
+													"maxLength": 80,
+													"description": "What the user calls it, e.g. Visa card or car loan."
+												},
+												"balance": {
+													"description": "Amount owed now.",
+													"anyOf": [
+														{
+															"type": "number"
+														},
+														{
+															"type": "string",
+															"pattern": "^-?\\d+(\\.\\d+)?$"
+														}
+													]
+												},
+												"apr": {
+													"description": "Annual interest rate as a percent, e.g. 24.99.",
+													"anyOf": [
+														{
+															"type": "number"
+														},
+														{
+															"type": "string",
+															"pattern": "^-?\\d+(\\.\\d+)?$"
+														}
+													]
+												},
+												"minimumPayment": {
+													"description": "Required monthly payment.",
+													"anyOf": [
+														{
+															"type": "number"
+														},
+														{
+															"type": "string",
+															"pattern": "^-?\\d+(\\.\\d+)?$"
+														}
+													]
+												}
+											},
+											"required": ["name", "balance", "apr", "minimumPayment"]
+										}
+									}
+								},
+								"required": ["strategy", "extraMonthly"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_estimate_quarterly_tax": {
+			"post": {
+				"operationId": "betteroff_estimate_quarterly_tax",
+				"summary": "Estimate quarterly tax",
+				"description": "Use this when the user asks how much federal estimated tax to pay each quarter or about safe harbor. Compute US federal quarterly estimated tax by safe harbor from figures the user states. Ask for missing figures; never guess. Pass filingStatus only when the user stated it; otherwise null.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"taxYear": {
+										"type": "integer",
+										"minimum": 2000,
+										"maximum": 2100,
+										"description": "Tax year being estimated, e.g. 2026."
+									},
+									"filingStatus": {
+										"anyOf": [
+											{
+												"type": "string",
+												"enum": ["single", "joint", "separate", "head", "surviving"]
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"priorYearTax": {
+										"anyOf": [
+											{
+												"anyOf": [
+													{
+														"type": "number"
+													},
+													{
+														"type": "string",
+														"pattern": "^-?\\d+(\\.\\d+)?$"
+													}
+												]
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Total tax on last year's return (Form 1040 line 24)."
+									},
+									"priorYearAgi": {
+										"anyOf": [
+											{
+												"anyOf": [
+													{
+														"type": "number"
+													},
+													{
+														"type": "string",
+														"pattern": "^-?\\d+(\\.\\d+)?$"
+													}
+												]
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Adjusted gross income on last year's return."
+									},
+									"projectedTax": {
+										"anyOf": [
+											{
+												"anyOf": [
+													{
+														"type": "number"
+													},
+													{
+														"type": "string",
+														"pattern": "^-?\\d+(\\.\\d+)?$"
+													}
+												]
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "This year's projected total tax, if the user has one."
+									},
+									"projectedAgi": {
+										"anyOf": [
+											{
+												"anyOf": [
+													{
+														"type": "number"
+													},
+													{
+														"type": "string",
+														"pattern": "^-?\\d+(\\.\\d+)?$"
+													}
+												]
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "This year's projected adjusted gross income."
+									},
+									"itemizedDeductions": {
+										"anyOf": [
+											{
+												"anyOf": [
+													{
+														"type": "number"
+													},
+													{
+														"type": "string",
+														"pattern": "^-?\\d+(\\.\\d+)?$"
+													}
+												]
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Projected itemized deductions; null uses the standard."
+									},
+									"expectedWithholding": {
+										"anyOf": [
+											{
+												"anyOf": [
+													{
+														"type": "number"
+													},
+													{
+														"type": "string",
+														"pattern": "^-?\\d+(\\.\\d+)?$"
+													}
+												]
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Federal tax withheld from pay this year, projected."
+									},
+									"estimatedPaymentsMade": {
+										"anyOf": [
+											{
+												"anyOf": [
+													{
+														"type": "number"
+													},
+													{
+														"type": "string",
+														"pattern": "^-?\\d+(\\.\\d+)?$"
+													}
+												]
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Estimated payments already made for this tax year."
+									}
+								},
+								"required": [
+									"taxYear",
+									"filingStatus",
+									"priorYearTax",
+									"priorYearAgi",
+									"projectedTax",
+									"projectedAgi",
+									"itemizedDeductions",
+									"expectedWithholding",
+									"estimatedPaymentsMade"
+								],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_get_giving_and_fees": {
+			"post": {
+				"operationId": "betteroff_get_giving_and_fees",
+				"summary": "Get giving and fees",
+				"description": "Use this when the user asks how much they gave to charity in a year, or what they paid in bank or investment fees. Get yearly totals of charitable donations, personal gifts, bank fees and investment fees from transactions, with fees per account.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"year": {
+										"anyOf": [
+											{
+												"type": "integer",
+												"minimum": 2000,
+												"maximum": 2100
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Calendar year; null for every year with data."
+									}
+								},
+								"required": ["year"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_get_checklist": {
+			"post": {
+				"operationId": "betteroff_get_checklist",
+				"summary": "Get checklist",
+				"description": "Use this when the user asks what to do next, how prepared the household is, or about insurance, estate documents, an emergency fund, retirement accounts, or credit freezes; for an explicit saved tax-review request, use includeTaxReviews to read current scoped results. Get the household's readiness checklist: 0-100 score, 30-day change, and each item's status, evidence, and points. Edits happen in BetterOff. taxReviewsStatus says if Taxes is enabled.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"includeTaxReviews": {
+										"type": "boolean"
+									}
+								},
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_list_deadlines": {
+			"post": {
+				"operationId": "betteroff_list_deadlines",
+				"summary": "List deadlines",
+				"description": "Use this when the user asks what is due soon: tax dates, renewals, RMDs, filings, estate tasks, or other dated deadlines. List the household's recorded deadlines and federal tax dates.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"days": {
+										"description": "List deadlines due within this many days (default 90).",
+										"type": "integer",
+										"minimum": 1,
+										"maximum": 730
+									},
+									"includeFederalTax": {
+										"description": "Include federal tax dates (default true).",
+										"type": "boolean"
+									},
+									"includeDone": {
+										"description": "Include deadlines marked done.",
+										"type": "boolean"
+									}
+								},
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_get_budgets": {
+			"post": {
+				"operationId": "betteroff_get_budgets",
+				"summary": "Get budgets",
+				"description": "Use this when the user asks how spending compares with their category budgets or how their savings goals are progressing. Read the household's category budgets against this month's spending, and savings goals against their linked accounts.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {},
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_search_activity": {
+			"post": {
+				"operationId": "betteroff_search_activity",
+				"summary": "Search activity",
+				"description": "Use this when the user asks about recorded account changes or correction proposals. Read recent record changes and proposal status, e.g. whether a category, recurring or debt correction the user proposed is still pending or was approved. For an account's correction proposals (pending or approved), set accountId (via betteroff_list_accounts), actorType=all, action=null; needs corrections:prepare. Omits security events and raw fields.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"accountId": {
+										"default": null,
+										"description": "An account id from betteroff_list_accounts. Use null for every account.",
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "uuid",
+												"pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"actorType": {
+										"type": "string",
+										"enum": ["agent", "user", "system", "all"]
+									},
+									"action": {
+										"anyOf": [
+											{
+												"type": "string",
+												"enum": [
+													"categorize_transaction",
+													"update_transaction",
+													"classify_recurring",
+													"confirm_debt_details",
+													"apply_correction",
+													"undo_correction"
+												]
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"limit": {
+										"anyOf": [
+											{
+												"type": "integer",
+												"minimum": 1,
+												"maximum": 50
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"before": {
+										"default": null,
+										"description": "Pass page.nextCursor from the previous result unchanged, for example {\"timestamp\":\"2026-01-31T12:00:00.000Z\",\"id\":\"<uuid>\"}. Use null for the first page.",
+										"anyOf": [
+											{
+												"type": "object",
+												"properties": {
+													"timestamp": {
+														"type": "string",
+														"format": "date-time",
+														"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+													},
+													"id": {
+														"type": "string",
+														"format": "uuid",
+														"pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+													}
+												},
+												"required": ["timestamp", "id"]
+											},
+											{
+												"type": "null"
+											}
+										]
+									}
+								},
+								"required": ["actorType", "action", "limit"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_list_observations": {
+			"post": {
+				"operationId": "betteroff_list_observations",
+				"summary": "List observations",
+				"description": "Use this when the user asks about recorded financial findings and their status. Read recorded household financial findings and their status. Excludes insurance checklist findings. Does not refresh or dismiss findings.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"status": {
+										"anyOf": [
+											{
+												"type": "string",
+												"enum": ["open", "snoozed", "dismissed", "resolved"]
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"limit": {
+										"anyOf": [
+											{
+												"type": "integer",
+												"minimum": 1,
+												"maximum": 30
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"before": {
+										"anyOf": [
+											{
+												"type": "object",
+												"properties": {
+													"timestamp": {
+														"type": "string",
+														"format": "date-time",
+														"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+													},
+													"id": {
+														"type": "string",
+														"format": "uuid",
+														"pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+													}
+												},
+												"required": ["timestamp", "id"]
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Pass page.nextCursor from the previous result unchanged, for example {\"timestamp\":\"2026-01-31T12:00:00.000Z\",\"id\":\"<uuid>\"}. Use null for the first page."
+									}
+								},
+								"required": ["status", "limit", "before"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_propose_category_change": {
+			"post": {
+				"operationId": "betteroff_propose_category_change",
+				"summary": "Propose category change",
+				"description": "Use this when the user asks to correct the category of selected transactions. Prepare a durable category correction for selected transaction IDs. This saves a pending proposal and changes no financial records. The user must open the authenticated review link and explicitly choose selected payments or matching and future payments. Never report a proposal as applied.",
+				"x-mcp-annotations": {
+					"readOnlyHint": false,
+					"destructiveHint": false,
+					"openWorldHint": false,
+					"idempotentHint": true
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"transactionIds": {
+										"minItems": 1,
+										"maxItems": 10,
+										"type": "array",
+										"items": {
+											"type": "string",
+											"format": "uuid",
+											"pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+										},
+										"description": "Transaction ids from betteroff_search_transactions results (the id field)."
+									},
+									"category": {
+										"type": "string",
+										"enum": [
+											"FOOD_AND_DRINK",
+											"RENT_AND_UTILITIES",
+											"ENTERTAINMENT",
+											"GENERAL_MERCHANDISE",
+											"GENERAL_SERVICES",
+											"PEER_PAYMENTS",
+											"TRANSPORTATION",
+											"TRAVEL",
+											"PERSONAL_CARE",
+											"MEDICAL",
+											"EDUCATION",
+											"INSURANCE",
+											"GIFTS_AND_DONATIONS",
+											"PETS",
+											"SUBSCRIPTIONS",
+											"REAL_ESTATE",
+											"INCOME",
+											"LOAN_PAYMENTS",
+											"TRANSFER_IN",
+											"TRANSFER_OUT",
+											"BANK_FEES",
+											"GOVERNMENT_AND_NON_PROFIT",
+											"HOME_IMPROVEMENT",
+											"OTHER"
+										]
+									}
+								},
+								"required": ["transactionIds", "category"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_propose_recurring_kind": {
+			"post": {
+				"operationId": "betteroff_propose_recurring_kind",
+				"summary": "Propose recurring kind",
+				"description": "Use this when the user says a recurring payment should be a bill or a subscription, for example that a Zelle payment is rent. Propose marking one of the user's recurring outgoing payments as a bill or a subscription. Get the streamId first with betteroff_list_recurring. This tool changes nothing: the user opens the review link and approves it in BetterOff. Never say the change is done.",
+				"x-mcp-annotations": {
+					"readOnlyHint": false,
+					"destructiveHint": false,
+					"openWorldHint": false,
+					"idempotentHint": true
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"streamId": {
+										"type": "string",
+										"minLength": 1,
+										"maxLength": 200,
+										"description": "The streamId from betteroff_list_recurring."
+									},
+									"kind": {
+										"type": "string",
+										"enum": ["bill", "subscription"],
+										"description": "What the payment should be marked as."
+									}
+								},
+								"required": ["streamId", "kind"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_propose_debt_details": {
+			"post": {
+				"operationId": "betteroff_propose_debt_details",
+				"summary": "Propose debt details",
+				"description": "Use this when the user provides a debt's APR, minimum payment, or next due date to save. Propose saving debt details the user states in chat: APR, minimum payment, or next due date, e.g. 'my Chase card APR is 24.99%'. Pass debtId from betteroff_list_debts, else the debt name. Use only numbers the user stated. This changes nothing until the user approves it at the review link; never say it is done.",
+				"x-mcp-annotations": {
+					"readOnlyHint": false,
+					"destructiveHint": false,
+					"openWorldHint": false,
+					"idempotentHint": true
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"debtId": {
+										"description": "The debt's id from betteroff_list_debts. Preferred over debtName.",
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "uuid",
+												"pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"debtName": {
+										"description": "The debt's name as betteroff_list_debts returns it. Null when debtId is given.",
+										"anyOf": [
+											{
+												"type": "string",
+												"minLength": 1,
+												"maxLength": 200
+											},
+											{
+												"type": "null"
+											}
+										]
+									},
+									"interestRate": {
+										"anyOf": [
+											{
+												"type": "number",
+												"minimum": 0,
+												"maximum": 100
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "APR as a percent, e.g. 24.99. Null to leave it unchanged."
+									},
+									"minimumPayment": {
+										"anyOf": [
+											{
+												"anyOf": [
+													{
+														"type": "number"
+													},
+													{
+														"type": "string",
+														"pattern": "^-?\\d+(\\.\\d+)?$"
+													}
+												]
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Minimum monthly payment, as a number or decimal text. Null to leave it unchanged."
+									},
+									"nextPaymentDueDate": {
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "date",
+												"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+											},
+											{
+												"type": "null"
+											}
+										],
+										"description": "Next due date as YYYY-MM-DD. Null to leave it unchanged."
+									}
+								},
+								"required": ["interestRate", "minimumPayment", "nextPaymentDueDate"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_propose_budget": {
+			"post": {
+				"operationId": "betteroff_propose_budget",
+				"summary": "Propose budget",
+				"description": "Use this when the user states a monthly amount to budget for a spending category. Propose a monthly category budget. In chat, use an amount the user stated; a scheduled household agent check may use the category's own average monthly spending. Nothing changes until the user approves it at the review link.",
+				"x-mcp-annotations": {
+					"readOnlyHint": false,
+					"destructiveHint": false,
+					"openWorldHint": false,
+					"idempotentHint": true
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"category": {
+										"type": "string",
+										"enum": [
+											"FOOD_AND_DRINK",
+											"RENT_AND_UTILITIES",
+											"ENTERTAINMENT",
+											"GENERAL_MERCHANDISE",
+											"GENERAL_SERVICES",
+											"PEER_PAYMENTS",
+											"TRANSPORTATION",
+											"TRAVEL",
+											"PERSONAL_CARE",
+											"MEDICAL",
+											"EDUCATION",
+											"INSURANCE",
+											"GIFTS_AND_DONATIONS",
+											"PETS",
+											"SUBSCRIPTIONS",
+											"BANK_FEES",
+											"GOVERNMENT_AND_NON_PROFIT",
+											"HOME_IMPROVEMENT",
+											"OTHER"
+										]
+									},
+									"monthlyAmount": {
+										"description": "The monthly amount the user stated, or in an agent check the category's average monthly spending, as a number or decimal text.",
+										"anyOf": [
+											{
+												"type": "number"
+											},
+											{
+												"type": "string",
+												"pattern": "^-?\\d+(\\.\\d+)?$"
+											}
+										]
+									},
+									"currency": {
+										"type": "string",
+										"pattern": "^[A-Za-z]{3}$",
+										"description": "ISO currency code of the amount, e.g. USD."
+									}
+								},
+								"required": ["category", "monthlyAmount", "currency"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_get_checkout_link": {
+			"post": {
+				"operationId": "betteroff_get_checkout_link",
+				"summary": "Get checkout link",
+				"description": "Use this when the user asks to buy more AI, upgrade to Plus, or pay for BetterOff. Returns a link for the user to buy something themselves in secure Stripe Checkout. This tool cannot charge anyone. \"ai\" is more AI: a one-time $5 Chat Boost on a paid plan, or the Plus plan on Core. Share the link and let the user decide.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"item": {
+										"type": "string",
+										"enum": ["ai", "better_monthly", "better_annual"]
+									}
+								},
+								"required": ["item"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_submit_feedback": {
+			"post": {
+				"operationId": "betteroff_submit_feedback",
+				"summary": "Submit feedback",
+				"description": "Send a diagnostic report to BetterOff support only when the user requests or approves sending it. Creates a support case, not a financial correction. Never send conversation history, balances, transactions, tool payloads, or credentials. Reuse the idempotency key when retrying. Returns a receipt, not a promise of resolution.",
+				"x-mcp-annotations": {
+					"readOnlyHint": false,
+					"destructiveHint": false,
+					"openWorldHint": false,
+					"idempotentHint": true
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"category": {
+										"type": "string",
+										"enum": ["bug", "confusing_result", "missing_capability", "suggestion"]
+									},
+									"description": {
+										"type": "string",
+										"minLength": 1,
+										"maxLength": 1000,
+										"description": "User-approved diagnostic summary. Exclude financial data, credentials, conversation history, and tool payloads."
+									},
+									"toolName": {
+										"type": "string",
+										"pattern": "^betteroff_[a-z_]{1,80}$"
+									},
+									"requestId": {
+										"type": "string",
+										"pattern": "^[A-Za-z0-9_-]{1,128}$"
+									},
+									"client": {
+										"type": "string",
+										"minLength": 1,
+										"maxLength": 80,
+										"pattern": "^[A-Za-z0-9 ._+-]+$"
+									},
+									"clientVersion": {
+										"type": "string",
+										"minLength": 1,
+										"maxLength": 40,
+										"pattern": "^[A-Za-z0-9 ._+-]+$"
+									},
+									"idempotencyKey": {
+										"type": "string",
+										"format": "uuid",
+										"pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+										"description": "Generate once per report; reuse for every retry."
+									},
+									"userApproved": {
+										"type": "boolean",
+										"const": true,
+										"description": "True only after the user requests or approves sending this report."
+									}
+								},
+								"required": ["category", "description", "idempotencyKey", "userApproved"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_track_wallet": {
+			"post": {
+				"operationId": "betteroff_track_wallet",
+				"summary": "Track a wallet",
+				"description": "Add a public wallet address the user gave you so BetterOff tracks its balances. Read-only: it cannot sign or move funds. Only use an address the user provided. Never send a recovery phrase or private key. The import runs in the background, so check accounts again after about a minute.",
+				"x-mcp-annotations": {
+					"readOnlyHint": false,
+					"destructiveHint": false,
+					"openWorldHint": true,
+					"idempotentHint": true
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"address": {
+										"type": "string",
+										"minLength": 1,
+										"maxLength": 128
+									}
+								},
+								"required": ["address"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_add_manual_account": {
+			"post": {
+				"operationId": "betteroff_add_manual_account",
+				"summary": "Add a manual account",
+				"description": "Add an account the user describes in conversation, with its current balance, so BetterOff can answer about it without a bank connection. Use it when the user tells you what they have or owe (for example: checking about $8,000, a car loan of $22,000). Enter a debt as the positive amount owed. Call once per account; ask before guessing a balance. A repeat with the same name returns the existing account; use betteroff_update_manual_balance to change it. It cannot connect a bank or move money.",
+				"x-mcp-annotations": {
+					"readOnlyHint": false,
+					"destructiveHint": false,
+					"openWorldHint": false,
+					"idempotentHint": true
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string",
+										"minLength": 1,
+										"maxLength": 200
+									},
+									"kind": {
+										"type": "string",
+										"enum": [
+											"checking",
+											"savings",
+											"money_market",
+											"cd",
+											"hsa",
+											"brokerage",
+											"401k",
+											"roth_401k",
+											"403b",
+											"ira",
+											"roth_ira",
+											"pension",
+											"credit_card",
+											"mortgage",
+											"auto_loan",
+											"student_loan",
+											"personal_loan",
+											"home_equity",
+											"other_loan",
+											"bitcoin",
+											"ethereum",
+											"other_asset"
+										]
+									},
+									"balance": {
+										"anyOf": [
+											{
+												"type": "number"
+											},
+											{
+												"type": "string",
+												"minLength": 1,
+												"maxLength": 32
+											}
+										]
+									},
+									"currency": {
+										"type": "string",
+										"minLength": 2,
+										"maxLength": 12
+									}
+								},
+								"required": ["name", "kind", "balance"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_update_manual_balance": {
+			"post": {
+				"operationId": "betteroff_update_manual_balance",
+				"summary": "Update a manual balance",
+				"description": "Set the current balance of a hand-entered account when the user tells you a new number. Use an accountId from betteroff_add_manual_account or list_accounts. Enter a debt as the positive amount owed. Bank-connected accounts update themselves and cannot be changed here.",
+				"x-mcp-annotations": {
+					"readOnlyHint": false,
+					"destructiveHint": true,
+					"openWorldHint": false,
+					"idempotentHint": true
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"accountId": {
+										"type": "string",
+										"format": "uuid",
+										"pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+									},
+									"balance": {
+										"anyOf": [
+											{
+												"type": "number"
+											},
+											{
+												"type": "string",
+												"minLength": 1,
+												"maxLength": 32
+											}
+										]
+									}
+								},
+								"required": ["accountId", "balance"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_get_chief_list": {
+			"post": {
+				"operationId": "betteroff_get_chief_list",
+				"summary": "Get Chief's weekly list",
+				"description": "Use this when the user asks what to do first, what matters this week, or what Chief says. Returns Chief's weekly list: the top things to do first, ranked from every BetterOff agent's findings, each with its figure and one step, plus when Chief last ran. When the list is missing or stale, start Chief with betteroff_run_agent. Chief comes with Plus; on another plan this returns code PLAN_REQUIRED with an upgradeUrl to start a free trial. Nothing on the list has been sent or paid.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {},
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_list_agents": {
+			"post": {
+				"operationId": "betteroff_list_agents",
+				"summary": "List agents",
+				"description": "Lists the household's BetterOff agents (Chief, Scout, Bookkeeper, Forecaster, Taxman, Coach, Negotiator): what each one does, its schedule, whether the household's plan includes it, and its last run with its summary. Chief reads every other agent's findings and ranks them, so start with Chief when the user asks what to do first. Agents only read data, file findings to To-Do, and prepare corrections; they never move money or send anything.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {},
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_run_agent": {
+			"post": {
+				"operationId": "betteroff_run_agent",
+				"summary": "Run an agent",
+				"description": "Starts one of the household's BetterOff agents now and returns its runId. The run takes a minute or two; then call betteroff_get_agent_run with the runId for its summary and findings. Use it when the user asks an agent to check something now (for example \"ask Chief what to do first this week\"). Agents: Chief, Bookkeeper, Scout, Forecaster, Taxman, Coach, Negotiator. One run per agent per ten minutes: a repeat in that window returns the same run. Most agents come with Plus; for one the plan does not include, this returns code PLAN_REQUIRED with an upgradeUrl the user can open to start a free trial. Agents read data, file findings and prepare corrections for the user to approve; they never move money, and nothing is sent on the user's behalf.",
+				"x-mcp-annotations": {
+					"readOnlyHint": false,
+					"destructiveHint": false,
+					"openWorldHint": false,
+					"idempotentHint": true
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"agent": {
+										"type": "string",
+										"minLength": 1,
+										"maxLength": 40,
+										"description": "The agent's name or key: Chief, Bookkeeper, Scout, Forecaster, Taxman, Coach, Negotiator."
+									}
+								},
+								"required": ["agent"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_get_agent_run": {
+			"post": {
+				"operationId": "betteroff_get_agent_run",
+				"summary": "Get an agent run",
+				"description": "Reads one agent run: its status (running, completed, failed, skipped), its summary, and the open findings the agent filed since the run started, each with its amount and due date. Call it with the runId from betteroff_run_agent; while status is running, wait a minute and call again.",
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"runId": {
+										"type": "string",
+										"format": "uuid",
+										"pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+										"description": "The runId betteroff_run_agent or betteroff_list_agents returned."
+									}
+								},
+								"required": ["runId"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_respond_to_finding": {
+			"post": {
+				"operationId": "betteroff_respond_to_finding",
+				"summary": "Respond to a finding",
+				"description": "Use this when the user asks to clear, dismiss, snooze, or mark done one of their BetterOff findings (an item on Chief's list or To-Do). Pass the finding's id and duplicateIds from list_observations (or the findingId from betteroff_get_agent_run or betteroff_get_chief_list), and one response: dismiss, snooze (30 days) or done. Ask the user which one before calling. It only changes the finding's status; it never moves money, sends anything, or approves a correction (corrections are approved in BetterOff).",
+				"x-mcp-annotations": {
+					"readOnlyHint": false,
+					"destructiveHint": false,
+					"openWorldHint": false,
+					"idempotentHint": true
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {
+									"findingId": {
+										"type": "string",
+										"minLength": 1,
+										"maxLength": 300,
+										"description": "The finding's id from list_observations, or its findingId from betteroff_get_agent_run or betteroff_get_chief_list."
+									},
+									"duplicateIds": {
+										"description": "The finding's duplicateIds from list_observations, so the whole finding clears.",
+										"maxItems": 20,
+										"type": "array",
+										"items": {
+											"type": "string",
+											"minLength": 1,
+											"maxLength": 300
+										}
+									},
+									"response": {
+										"type": "string",
+										"enum": ["dismiss", "snooze", "done"],
+										"description": "dismiss: not useful, don't show it again. snooze: hide it for 30 days. done: the user already did it."
+									}
+								},
+								"required": ["findingId", "response"],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/tools/betteroff_get_household_overview": {
+			"post": {
+				"operationId": "betteroff_get_household_overview",
+				"summary": "Get overview",
+				"description": "Retired name for betteroff_get_overview; removed on 2027-04-13. Responses carry Deprecation and Sunset headers.",
+				"deprecated": true,
+				"x-mcp-annotations": {
+					"readOnlyHint": true,
+					"destructiveHint": false,
+					"openWorldHint": false
+				},
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$schema": "https://json-schema.org/draft/2020-12/schema",
+								"type": "object",
+								"properties": {},
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

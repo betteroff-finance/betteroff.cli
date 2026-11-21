@@ -1,0 +1,18 @@
+$ betteroff recurring --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff recurring␛[22m  List recurring
+
+Use this when the user asks about recurring bills, subscriptions, or income. Get recurring bills,
+subscriptions and income (Plaid-reported and detected streams), without credit card payments.
+Duplicate streams are merged; ended streams are listed apart in `ended`. Not a payment history (use
+search_transactions) or proof of insurance coverage.
+
+␛[1mFlags␛[22m
+  --coverage-days <integer>
+␛[2m      Compare bills and debt minimums due in this many days with bank cash.␛[22m
+
+␛[2mAlso: betteroff list-recurring␛[22m
+
+--- stderr

@@ -1,0 +1,7 @@
+$ betteroff accounts
+# tty, color, columns=100 (signed out)
+# exit 1
+--- stdout
+
+--- stderr
+Not signed in. Run: betteroff login

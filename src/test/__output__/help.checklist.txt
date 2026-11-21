@@ -1,0 +1,18 @@
+$ betteroff checklist --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff checklist␛[22m  Get checklist
+
+Use this when the user asks what to do next, how prepared the household is, or about insurance,
+estate documents, an emergency fund, retirement accounts, or credit freezes; for an explicit saved
+tax-review request, use includeTaxReviews to read current scoped results. Get the household's
+readiness checklist: 0-100 score, 30-day change, and each item's status, evidence, and points. Edits
+happen in BetterOff. taxReviewsStatus says if Taxes is enabled.
+
+␛[1mFlags␛[22m
+  --include-tax-reviews
+
+␛[2mAlso: betteroff get-checklist␛[22m
+
+--- stderr

@@ -1,0 +1,8 @@
+$ betteroff agents run chief
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[2mRun id␛[22m  run_123
+
+--- stderr
+Read it when it finishes: betteroff agent-run --run-id run_123

@@ -1,0 +1,22 @@
+$ betteroff overview
+# tty, NO_COLOR=1, columns=100
+# exit 0
+--- stdout
+Net worth       $185,925.35
+Assets          $187,214.65
+Liabilities     -$1,289.30
+Top categories  Groceries, Dining, Utilities
+
+Needs attention
+  - Rewards Card ••4021 payment due Nov 14
+  - 2 transactions need a category
+  - Estimated Q4 tax payment due Jan 15
+
+Month to date
+  Income                $3,125.00
+  Spending              -$1,840.22
+  Savings rate percent  41%
+
+As of 2026-11-02 14:05 UTC
+
+--- stderr

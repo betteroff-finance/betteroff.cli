@@ -1,0 +1,34 @@
+$ betteroff account-flows --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff account-flows␛[22m  Get account flows
+
+Use this when the user asks how much entered or left specific accounts. Gross inflows, gross
+outflows, and net flow for selected accounts over a date range, aggregated over ALL matches
+server-side, e.g. 'how much did I deposit into Schwab this year'. Prefer this over
+betteroff_search_transactions for deposit/withdrawal totals.
+
+␛[1mFlags␛[22m
+  --start-date <text>
+␛[2m      Start date (ISO format, e.g. 2026-01-01). Leave out for Jan 1 of this year.␛[22m
+  --end-date <text>
+␛[2m      End date (ISO format). Leave out for today.␛[22m
+  --account-ids <a,b>
+␛[2m      Specific account IDs to include. Leave out for select by accountType/institution.␛[22m
+  --account-type <text>
+␛[2m      Optional account type filter. Use investment for brokerage/retirement accounts.␛[22m
+␛[2m      One of: depository, investment, credit, loan, crypto, wallet␛[22m
+  --institution <text>
+␛[2m      Optional institution name filter, e.g. Charles Schwab. Partial matches are accepted.␛[22m
+  --direction <all|inflow|outflow>
+␛[2m      Use inflow for deposits only, outflow for withdrawals only, all for both.␛[22m
+  --limit <integer>
+␛[2m      Max transaction rows to return for evidence (default 25, max 100).␛[22m
+  --cursor <json>
+␛[2m      Pass page.nextCursor from the previous result unchanged, with the same other arguments. Omit␛[22m
+␛[2m      or use null for the first page.␛[22m
+
+␛[2mAlso: betteroff get-account-flows␛[22m
+
+--- stderr

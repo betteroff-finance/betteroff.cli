@@ -1,0 +1,22 @@
+$ betteroff overview
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[2mNet worth     ␛[22m  $185,925.35
+␛[2mAssets        ␛[22m  $187,214.65
+␛[2mLiabilities   ␛[22m  -$1,289.30
+␛[2mTop categories␛[22m  Groceries, Dining, Utilities
+
+␛[1mNeeds attention␛[22m
+  - Rewards Card ••4021 payment due Nov 14
+  - 2 transactions need a category
+  - Estimated Q4 tax payment due Jan 15
+
+␛[1mMonth to date␛[22m
+  ␛[2mIncome              ␛[22m  $3,125.00
+  ␛[2mSpending            ␛[22m  -$1,840.22
+  ␛[2mSavings rate percent␛[22m  41%
+
+␛[2mAs of 2026-11-02 14:05 UTC␛[22m
+
+--- stderr

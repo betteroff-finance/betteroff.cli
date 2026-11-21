@@ -1,0 +1,20 @@
+$ betteroff defi-positions --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff defi-positions␛[22m  Get defi positions
+
+Use this when the user asks about DeFi, lending, staking, or LP positions, or protocol exposure.
+DeFi exposure by protocol across chains: total value, position count, per-asset breakdown.
+
+␛[1mFlags␛[22m
+  --protocol <text>
+␛[2m      Filter to a specific protocol name (case-insensitive substring match, e.g. 'aave', 'uniswap').␛[22m
+␛[2m      Leave out for all protocols.␛[22m
+  --chain <text>
+␛[2m      Filter to a specific chain slug (e.g. 'ethereum', 'base', 'arbitrum'). Leave out for all␛[22m
+␛[2m      chains.␛[22m
+
+␛[2mAlso: betteroff get-defi-positions␛[22m
+
+--- stderr

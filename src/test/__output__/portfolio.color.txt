@@ -1,0 +1,19 @@
+$ betteroff portfolio
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[2mTotal value       ␛[22m  $182,004.10
+␛[2mDay change        ␛[22m  -$412.88
+␛[2mDay change percent␛[22m  -0.23%
+
+␛[1mHoldings␛[22m
+␛[1m  Symbol  Name                             Price    Value        Weight percent  Quantity␛[22m
+  VTI     Vanguard Total Stock Market ETF  $301.22  $123,650.81  67.9%           410.5
+  BND     Vanguard Total Bond Market ETF   $72.10   $37,492.00   20.6%           520
+  USDC    USD Coin                         $1.00    $20,861.29   11.5%           20861.29
+
+␛[2mData is partial:␛[22m
+␛[2m  - Harbor Securities last synced 3 days ago.␛[22m
+␛[2mAs of 2026-11-02 14:05 UTC␛[22m
+
+--- stderr

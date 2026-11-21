@@ -1,0 +1,7 @@
+$ betteroff portfolio --group-by color
+# tty, color, columns=100
+# exit 2
+--- stdout
+
+--- stderr
+--group-by must be one of: type, account, symbol, instrument, underlying.

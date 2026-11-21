@@ -1,0 +1,12 @@
+$ betteroff budgets
+# tty, NO_COLOR=1, columns=100
+# exit 0
+--- stdout
+Category   Budgeted  Spent    Remaining
+Groceries  $600.00   $412.18  $187.82
+Dining     $250.00   $301.40  -$51.40
+Utilities  $220.00   $0.00    $220.00
+
+As of 2026-11-02 14:05 UTC
+
+--- stderr

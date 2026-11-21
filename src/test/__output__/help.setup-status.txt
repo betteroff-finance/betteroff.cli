@@ -1,0 +1,16 @@
+$ betteroff setup-status --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff setup-status␛[22m  Get setup status
+
+Use this when the user asks what is left to set up, wants to connect a bank or add a manual item,
+whether billing is active, or which connections need reconnecting. Cheap status check: whether this
+connection works, which permissions it has, and whether any accounts are connected. Returns billing
+state, account coverage, connections to reconnect, and sign-in-protected links for the user to
+connect a bank or add a manual item. Access issues link to support, not checkout. This tool cannot
+start checkout, connect accounts, or change agent access.
+
+␛[2mAlso: betteroff get-setup-status␛[22m
+
+--- stderr

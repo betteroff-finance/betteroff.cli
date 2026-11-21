@@ -1,0 +1,13 @@
+$ betteroff budgets --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff budgets␛[22m  Get budgets
+
+Use this when the user asks how spending compares with their category budgets or how their savings
+goals are progressing. Read the household's category budgets against this month's spending, and
+savings goals against their linked accounts.
+
+␛[2mAlso: betteroff get-budgets␛[22m
+
+--- stderr

@@ -1,0 +1,11 @@
+$ betteroff recurring
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mMerchant    Amount   Next date   Frequency  Kind␛[22m
+Streamflix  -$15.99  2026-11-12  monthly    subscription
+City Water  -$64.20  2026-11-20  monthly    bill
+
+␛[2mAs of 2026-11-02 14:05 UTC␛[22m
+
+--- stderr

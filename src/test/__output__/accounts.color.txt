@@ -1,0 +1,13 @@
+$ betteroff accounts
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mDisplay name                              Balance      Institution        Type␛[22m
+Everyday Checking                         $4,210.55    First Federal      checking
+Rewards Card ••4021                       -$1,289.30   Northline          credit
+Brokerage (joint, long-term holdings ac…  $182,004.10  Harbor Securities  investment
+␛[2m3 more columns hidden; use --json for everything␛[22m
+
+␛[2mAs of 2026-11-02 14:05 UTC␛[22m
+
+--- stderr

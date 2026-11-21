@@ -1,0 +1,14 @@
+$ betteroff household-overview --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff household-overview␛[22m  Get overview
+
+Retired name for betteroff_get_overview; removed on 2027-04-13. Responses carry Deprecation and
+Sunset headers.
+
+␛[2mDeprecated: this command will be removed. See its description.␛[22m
+
+␛[2mAlso: betteroff get-household-overview␛[22m
+
+--- stderr

@@ -1,0 +1,17 @@
+$ betteroff checkout-link --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff checkout-link␛[22m  Get checkout link
+
+Use this when the user asks to buy more AI, upgrade to Plus, or pay for BetterOff. Returns a link
+for the user to buy something themselves in secure Stripe Checkout. This tool cannot charge anyone.
+"ai" is more AI: a one-time $5 Chat Boost on a paid plan, or the Plus plan on Core. Share the link
+and let the user decide.
+
+␛[1mFlags␛[22m
+  --item <ai|better_monthly|better_annual>  ␛[1m(required)␛[22m
+
+␛[2mAlso: betteroff get-checkout-link␛[22m
+
+--- stderr

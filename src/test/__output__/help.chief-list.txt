@@ -1,0 +1,15 @@
+$ betteroff chief-list --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff chief-list␛[22m  Get Chief's weekly list
+
+Use this when the user asks what to do first, what matters this week, or what Chief says. Returns
+Chief's weekly list: the top things to do first, ranked from every BetterOff agent's findings, each
+with its figure and one step, plus when Chief last ran. When the list is missing or stale, start
+Chief with betteroff_run_agent. Chief comes with Plus; on another plan this returns code
+PLAN_REQUIRED with an upgradeUrl to start a free trial. Nothing on the list has been sent or paid.
+
+␛[2mAlso: betteroff get-chief-list␛[22m
+
+--- stderr

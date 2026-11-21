@@ -1,0 +1,20 @@
+$ betteroff deadlines --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff deadlines␛[22m  List deadlines
+
+Use this when the user asks what is due soon: tax dates, renewals, RMDs, filings, estate tasks, or
+other dated deadlines. List the household's recorded deadlines and federal tax dates.
+
+␛[1mFlags␛[22m
+  --days <integer>
+␛[2m      List deadlines due within this many days (default 90).␛[22m
+  --include-federal-tax
+␛[2m      Include federal tax dates (default true).␛[22m
+  --include-done
+␛[2m      Include deadlines marked done.␛[22m
+
+␛[2mAlso: betteroff list-deadlines␛[22m
+
+--- stderr

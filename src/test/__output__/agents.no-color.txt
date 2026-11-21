@@ -1,0 +1,11 @@
+$ betteroff agents
+# tty, NO_COLOR=1, columns=100
+# exit 0
+--- stdout
+Name   Open findings  Last run at       Enabled
+Chief  2              2026-11-02 06:00  yes
+Scout  0              -                 no
+
+As of 2026-11-02 14:05 UTC
+
+--- stderr

@@ -1,0 +1,55 @@
+$ betteroff --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff␛[22m <version>  Read your BetterOff household from the terminal.
+
+␛[1mUsage␛[22m
+  betteroff <command> [flags]
+  betteroff <command> --help
+
+␛[1mCommands␛[22m
+  account-flows             Get account flows
+  accounts                  List accounts
+  activity                  Search activity
+  agent-run                 Get an agent run
+  agents                    List agents
+  analyze-spending          Analyze spending
+  budgets                   Get budgets
+  cash-flow                 Get cash flow
+  checklist                 Get checklist
+  checkout-link             Get checkout link
+  chief-list                Get Chief's weekly list
+  deadlines                 List deadlines
+  debts                     List debts
+  defi-positions            Get defi positions
+  detect-spending-patterns  Detect spending patterns
+  estimate-quarterly-tax    Estimate quarterly tax
+  explain-net-worth-change  Explain net worth change
+  forecast-balances         Forecast balances
+  giving-and-fees           Get giving and fees
+  household-overview        Get overview (deprecated)
+  net-worth-history         Get net worth history
+  observations              List observations
+  overview                  Get overview
+  portfolio                 Get portfolio
+  preview-cash-plan         Preview cash plan
+  recurring                 List recurring
+  setup-status              Get setup status
+  simulate-debt-payoff      Simulate debt payoff
+  transactions              Search transactions
+  agents run                Start an agent now: betteroff agents run <name> [--wait]
+
+␛[1mAccount␛[22m
+  login                     Sign in with your browser (--token to paste an API token)
+  logout                    Sign out and end the sign-in at BetterOff
+  status                    Show which token and API this CLI uses
+
+␛[1mFlags␛[22m
+  --json     Print the raw JSON result (the default when output is piped)
+  --help     Show help for a command
+  --version  Show the CLI version
+
+␛[2mThis CLI cannot move money or approve anything. Only `agents run` starts work: the agent files findings and prepares corrections for you to approve in BetterOff.␛[22m
+
+--- stderr

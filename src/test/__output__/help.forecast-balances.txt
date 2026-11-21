@@ -1,0 +1,17 @@
+$ betteroff forecast-balances --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff forecast-balances␛[22m  Forecast balances
+
+Use this when the user asks whether a checking or savings account will cover what is due in the next
+few weeks, or how low an account will get. Project each checking and savings account's balance day
+by day over the next 14 days (up to 35): the starting balance, every dated bill, card payment and
+income due from that account, the running balance, and the low point with its date. Computed in code
+from the account's own recurring streams; use it instead of projecting balances by hand.
+
+␛[1mFlags␛[22m
+  --days <integer>
+␛[2m      How many days ahead to project. Defaults to 14.␛[22m
+
+--- stderr

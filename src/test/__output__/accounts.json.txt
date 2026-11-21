@@ -1,0 +1,44 @@
+$ betteroff accounts --json
+# tty, color, columns=100
+# exit 0
+--- stdout
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "acc_1",
+      "displayName": "Everyday Checking",
+      "institution": "First Federal",
+      "type": "checking",
+      "balance": "4210.55",
+      "currency": "USD",
+      "lastSyncedAt": "2026-11-02T13:58:12Z",
+      "isHidden": false
+    },
+    {
+      "id": "acc_2",
+      "displayName": "Rewards Card ••4021",
+      "institution": "Northline",
+      "type": "credit",
+      "balance": "-1289.30",
+      "currency": "USD",
+      "lastSyncedAt": "2026-11-02T13:58:12Z",
+      "isHidden": false
+    },
+    {
+      "id": "acc_3",
+      "displayName": "Brokerage (joint, long-term holdings account)",
+      "institution": "Harbor Securities",
+      "type": "investment",
+      "balance": "182004.10",
+      "currency": "USD",
+      "lastSyncedAt": null,
+      "isHidden": true
+    }
+  ],
+  "currency": "USD",
+  "asOf": "2026-11-02T14:05:00Z",
+  "warnings": []
+}
+
+--- stderr

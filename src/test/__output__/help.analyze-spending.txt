@@ -1,0 +1,19 @@
+$ betteroff analyze-spending --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff analyze-spending␛[22m  Analyze spending
+
+Use this when the user asks where money went or compares spending across periods. Read category or
+merchant spending for a period, optionally against an earlier one. Excludes transfers and loan
+payments; fees and interest count.
+
+␛[1mFlags␛[22m
+  --group-by <category|merchant>
+  --start-date <text>
+␛[2m      Start date (ISO). Leave out for start of current month.␛[22m
+  --end-date <text>
+␛[2m      End date (ISO). Leave out for today.␛[22m
+  --comparison <json>
+
+--- stderr

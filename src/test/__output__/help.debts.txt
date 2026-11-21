@@ -1,0 +1,14 @@
+$ betteroff debts --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff debts␛[22m  List debts
+
+Use this when the user asks what they owe or which debt terms are missing. Get the user's debts
+(cards and loans): names with last digits, balances with balanceAsOf, APRs, minimum payments, next
+payment due dates, totals, and a balance-weighted average APR. Use for debt, interest rate, or
+payoff-priority questions.
+
+␛[2mAlso: betteroff list-debts␛[22m
+
+--- stderr

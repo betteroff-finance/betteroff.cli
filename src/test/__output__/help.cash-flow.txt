@@ -1,0 +1,19 @@
+$ betteroff cash-flow --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff cash-flow␛[22m  Get cash flow
+
+Use this when the user asks about income, expenses, or cash flow. Get income vs expenses for a
+period with prior-period comparison and projections. Use for cash flow, earned vs spent, or saving
+questions.
+
+␛[1mFlags␛[22m
+  --start-date <text>
+␛[2m      Start date (ISO). Leave out for start of current month.␛[22m
+  --end-date <text>
+␛[2m      End date (ISO). Leave out for today.␛[22m
+
+␛[2mAlso: betteroff get-cash-flow␛[22m
+
+--- stderr

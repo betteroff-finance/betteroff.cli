@@ -212,8 +212,17 @@ jobs:
       # Signed SLSA provenance tying each binary to this workflow run and commit.
       # Verify with: gh attestation verify <file> --repo betteroff-finance/betteroff.cli
       - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        id: attest
         with:
           subject-path: release/betteroff-*
+      # Ships the same signed provenance as a release asset, for offline checks:
+      # gh attestation verify <file> --bundle betteroff.sigstore.json --repo betteroff-finance/betteroff.cli
+      - name: Add the provenance bundle to the release
+        env:
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+        run: |
+          test -s "$BUNDLE" || { echo "no attestation bundle at $BUNDLE"; exit 1; }
+          cp "$BUNDLE" release/betteroff.sigstore.json
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}

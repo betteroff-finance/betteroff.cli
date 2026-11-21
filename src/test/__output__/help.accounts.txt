@@ -1,0 +1,18 @@
+$ betteroff accounts --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff accounts␛[22m  List accounts
+
+Use this when the user asks which accounts are connected or wants account balances. Get the user's
+connected accounts with balances, types, and institutions.
+
+␛[1mFlags␛[22m
+  --account-type <text>
+␛[2m      Filter by account type; wallet means on-chain wallets, crypto adds exchanges. Omit or use null␛[22m
+␛[2m      to get all accounts.␛[22m
+␛[2m      One of: depository, investment, credit, loan, crypto, wallet␛[22m
+
+␛[2mAlso: betteroff list-accounts␛[22m
+
+--- stderr

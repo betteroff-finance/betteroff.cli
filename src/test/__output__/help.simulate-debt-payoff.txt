@@ -1,0 +1,27 @@
+$ betteroff simulate-debt-payoff --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff simulate-debt-payoff␛[22m  Simulate debt payoff
+
+Use this when the user asks to compare debt payoff strategies. Simulate paying off debts by
+avalanche (highest APR first) or snowball (smallest balance first), with an optional extra monthly
+payment. Debts missing a balance, APR, minimum payment, or FX rate are listed in skippedDebts.
+betteroff_propose_debt_details saves terms the user states. When the user states their debts in the
+chat (for example a household with nothing connected yet), pass them as `debts` and the projection
+runs on exactly those numbers instead of stored data; nothing is saved. Read-only; never moves
+money.
+
+␛[1mFlags␛[22m
+  --strategy <avalanche|snowball>␛[2m  (default: "avalanche")␛[22m
+␛[2m      avalanche = highest APR first (minimizes interest); snowball = smallest balance first (faster␛[22m
+␛[2m      early wins).␛[22m
+  --extra-monthly <json>␛[2m  (default: 0)␛[22m
+␛[2m      Extra amount paid toward debts each month beyond the minimums, in the user's base currency, as␛[22m
+␛[2m      a number or decimal text. Use 0 for none.␛[22m
+  --debts <json>
+␛[2m      Debts exactly as the user stated them in this chat, in their base currency. Only numbers the␛[22m
+␛[2m      user gave; ask for any that are missing rather than guessing. Omit to use the household's␛[22m
+␛[2m      stored debts.␛[22m
+
+--- stderr

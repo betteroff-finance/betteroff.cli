@@ -1,0 +1,20 @@
+$ betteroff observations --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff observations␛[22m  List observations
+
+Use this when the user asks about recorded financial findings and their status. Read recorded
+household financial findings and their status. Excludes insurance checklist findings. Does not
+refresh or dismiss findings.
+
+␛[1mFlags␛[22m
+  --status <open|snoozed|dismissed|resolved>
+  --limit <integer>
+  --before <json>
+␛[2m      Pass page.nextCursor from the previous result unchanged, for example␛[22m
+␛[2m      {"timestamp":"2026-01-31T12:00:00.000Z","id":"<uuid>"}. Leave out for the first page.␛[22m
+
+␛[2mAlso: betteroff list-observations␛[22m
+
+--- stderr

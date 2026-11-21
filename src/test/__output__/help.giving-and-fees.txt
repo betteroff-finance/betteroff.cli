@@ -1,0 +1,17 @@
+$ betteroff giving-and-fees --help
+# tty, color, columns=100
+# exit 0
+--- stdout
+␛[1mbetteroff giving-and-fees␛[22m  Get giving and fees
+
+Use this when the user asks how much they gave to charity in a year, or what they paid in bank or
+investment fees. Get yearly totals of charitable donations, personal gifts, bank fees and investment
+fees from transactions, with fees per account.
+
+␛[1mFlags␛[22m
+  --year <integer>
+␛[2m      Calendar year; null for every year with data.␛[22m
+
+␛[2mAlso: betteroff get-giving-and-fees␛[22m
+
+--- stderr
