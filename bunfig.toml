@@ -4,3 +4,8 @@ cafile = "./src/ca.pem"
 exact = true
 minimumReleaseAge = 259200
 linker = "isolated"
+
+# Socket's free malware feed checks every package before Bun installs it (ops/dev/socket-scanner.ts
+# says what blocks where). ops/checks/check-config.ts keeps this the same in every Bun project.
+[install.security]
+scanner = "./scripts/socket-scanner.ts"
