@@ -10,15 +10,25 @@
 // (ops/checks/check-config.ts).
 
 const API = "https://firewall-api.socket.dev/purl/";
+
 const CONCURRENCY = 20;
+
 const RETRIES = 4;
+
 const unattended = Boolean(process.env.CI || process.env.VERCEL);
 
+// The firewall API's NDJSON record, as far as this scanner reads it. Alert text fields only feed the
+// advisory description, so they are typed as the API documents them and not checked one by one.
 interface Alert {
 	type?: string;
 	action?: string;
-	props?: { description?: unknown; note?: unknown; notes?: unknown; alternatePackage?: unknown };
-	fix?: { description?: unknown };
+	props?: { description?: string; note?: string; notes?: string; alternatePackage?: string };
+	fix?: { description?: string };
+}
+
+interface WireArtifact {
+	inputPurl?: string | null;
+	alerts?: Alert[] | null;
 }
 
 interface Artifact {
@@ -26,26 +36,26 @@ interface Artifact {
 	alerts: Alert[];
 }
 
+function isArtifact(record: WireArtifact | null): record is Artifact {
+	return (
+		record !== null &&
+		typeof record.inputPurl === "string" &&
+		(record.alerts === undefined || record.alerts === null || Array.isArray(record.alerts))
+	);
+}
+
 function parseArtifacts(body: string, purl: string): Artifact[] {
-	return body
-		.split(/\r?\n/)
-		.filter(Boolean)
-		.map((line) => {
-			const value: unknown = JSON.parse(line);
+	return body.split(/\r?\n/).flatMap((line) => {
+		if (line === "") return [];
 
-			if (
-				typeof value !== "object" ||
-				value === null ||
-				!("inputPurl" in value) ||
-				typeof value.inputPurl !== "string"
-			) {
-				throw new Error(`Socket returned an unexpected response for ${purl}`);
-			}
+		// SAFETY: each line is one JSON value; isArtifact checks the fields this scanner relies on
+		// before the record is used.
+		const record = JSON.parse(line) as WireArtifact | null;
 
-			const alerts = "alerts" in value && Array.isArray(value.alerts) ? value.alerts : [];
+		if (!isArtifact(record)) throw new Error(`Socket returned an unexpected response for ${purl}`);
 
-			return { inputPurl: value.inputPurl, alerts: alerts as Alert[] };
-		});
+		return [{ inputPurl: record.inputPurl, alerts: record.alerts ?? [] }];
+	});
 }
 
 async function lookup(purl: string): Promise<Artifact[]> {
@@ -56,6 +66,7 @@ async function lookup(purl: string): Promise<Artifact[]> {
 			const response = await fetch(API + encodeURIComponent(purl), {
 				headers: { "User-Agent": "bun-security-scanner" },
 			});
+
 			const body = await response.text();
 
 			if (response.ok) return parseArtifacts(body, purl);
@@ -77,26 +88,28 @@ async function lookup(purl: string): Promise<Artifact[]> {
 	}
 }
 
-function text(value: unknown): string | undefined {
-	return typeof value === "string" && value !== "" ? value : undefined;
+function nonEmpty(value: string | undefined): string | undefined {
+	return value === "" ? undefined : value;
 }
 
 function toAdvisories({ inputPurl, alerts }: Artifact): Bun.Security.Advisory[] {
 	const [, name, version] = inputPurl.match(/^pkg:npm\/(.+)@([^@]+)$/) ?? [];
+
 	const url =
 		name === undefined ? null : `https://socket.dev/npm/package/${name}/overview/${version}`;
 
 	return alerts.map((alert) => {
-		const typo = text(alert.props?.alternatePackage);
-		const notes = text(alert.props?.notes);
-		const note = text(alert.props?.note);
-		const fix = text(alert.fix?.description);
+		const typo = nonEmpty(alert.props?.alternatePackage);
+		const notes = nonEmpty(alert.props?.notes);
+		const note = nonEmpty(alert.props?.note);
+		const fix = nonEmpty(alert.fix?.description);
+
 		const description = [
 			alert.type,
 			alert.type === "didYouMean" && typo !== undefined
 				? `This package could be a typo-squatting attempt of ${typo}.`
 				: undefined,
-			text(alert.props?.description),
+			nonEmpty(alert.props?.description),
 			notes,
 			note === notes ? undefined : note,
 			fix === undefined ? undefined : `Fix: ${fix}`,
@@ -115,9 +128,10 @@ function toAdvisories({ inputPurl, alerts }: Artifact): Bun.Security.Advisory[] 
 
 async function scanAll(packages: Bun.Security.Package[]): Promise<Bun.Security.Advisory[]> {
 	// Registry packages only: workspace, file and git sources have no Socket record.
-	const purls = packages
-		.filter(({ version }) => /^\d+\.\d+\.\d+/.test(version))
-		.map(({ name, version }) => `pkg:npm/${name}@${version}`);
+	const purls = packages.flatMap(({ name, version }) =>
+		/^\d+\.\d+\.\d+/.test(version) ? [`pkg:npm/${name}@${version}`] : [],
+	);
+
 	const advisories: Bun.Security.Advisory[] = [];
 	let next = 0;
 
