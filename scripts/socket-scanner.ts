@@ -171,6 +171,14 @@ export const scanner: Bun.Security.Scanner = {
 
 		if (!unattended) return advisories;
 
+		// Vercel's build log does not show Bun's own "Scanning N packages" line, so the scanner says
+		// it ran.
+		const fatal = advisories.filter(({ level }) => level === "fatal").length;
+
+		process.stderr.write(
+			`Socket scan: ${packages.length} packages, ${fatal} blocking, ${advisories.length - fatal} warnings\n`,
+		);
+
 		for (const advisory of advisories.filter(({ level }) => level === "warn")) {
 			process.stderr.write(
 				`Socket warning, not blocking on CI or Vercel: ${advisory.package}: ${advisory.description}\n`,
